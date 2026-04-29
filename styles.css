@@ -109,6 +109,17 @@ nav a.active {
   padding: 64px 0 48px;
 }
 
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
 .hero h1 {
   font-size: 2.4rem;
   font-weight: 700;
@@ -122,6 +133,31 @@ nav a.active {
   color: var(--text-muted);
   max-width: 560px;
   line-height: 1.7;
+}
+
+.hero-photo {
+  flex-shrink: 0;
+  width: 240px;
+}
+
+.hero-photo img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.hero-photo .placeholder-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--border);
+  border-radius: var(--radius);
+  font-size: 4rem;
+  opacity: 0.4;
 }
 
 /* ---- Project Grid ---- */
@@ -379,6 +415,16 @@ footer nav a {
 @media (max-width: 640px) {
   .hero {
     padding: 40px 0 32px;
+  }
+
+  .hero-content {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 28px;
+  }
+
+  .hero-photo {
+    width: 160px;
   }
 
   .hero h1 {
