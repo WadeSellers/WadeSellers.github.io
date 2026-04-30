@@ -15,7 +15,7 @@
   --border: #e8e4df;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   --radius: 12px;
-  --max-width: 960px;
+  --max-width: 1140px;
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
@@ -106,13 +106,13 @@ nav a.active {
 
 /* ---- Hero / Intro ---- */
 .hero {
-  padding: 64px 0 48px;
+  padding: 96px 0 72px;
 }
 
 .hero-content {
   display: flex;
   align-items: center;
-  gap: 56px;
+  gap: 80px;
 }
 
 .hero-text {
@@ -121,23 +121,23 @@ nav a.active {
 }
 
 .hero h1 {
-  font-size: 2.4rem;
+  font-size: 3rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .hero p {
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   color: var(--text-muted);
-  max-width: 560px;
-  line-height: 1.7;
+  max-width: 640px;
+  line-height: 1.6;
 }
 
 .hero-photo {
   flex-shrink: 0;
-  width: 240px;
+  width: 360px;
 }
 
 .hero-photo img {
@@ -412,14 +412,24 @@ footer nav a {
 }
 
 /* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .hero-content {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 32px;
+  }
+
+  .hero-photo {
+    width: 220px;
+  }
+}
+
 @media (max-width: 640px) {
   .hero {
     padding: 40px 0 32px;
   }
 
   .hero-content {
-    flex-direction: column-reverse;
-    align-items: flex-start;
     gap: 28px;
   }
 
