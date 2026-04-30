@@ -101,6 +101,7 @@
     ball.attached = true;
     ball.dx = 0;
     ball.dy = 0;
+    state = 'ready';
   }
 
   function update() {
