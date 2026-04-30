@@ -1,8 +1,4 @@
 (() => {
-  const canvas = document.getElementById('matrix-rain');
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const KATAKANA_START = 0xff66;
@@ -49,112 +45,140 @@
     return 'rgb(0,0,0)';
   }
 
-  let dpr;
-  let cellSize;
-  let columns;
-  let columnData;
+  function start(canvas) {
+    const ctx = canvas.getContext('2d');
+    const minCellAttr = parseInt(canvas.dataset.minCell, 10);
+    const targetRowsAttr = parseInt(canvas.dataset.targetRows, 10);
+    const minCell = Number.isFinite(minCellAttr) ? minCellAttr : 12;
+    const targetRows = Number.isFinite(targetRowsAttr) ? targetRowsAttr : 30;
 
-  function init() {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let dpr;
+    let cellSize;
+    let columns;
+    let columnData;
+    let visible = true;
+    let frame = 0;
 
-    const targetRows = 30;
-    cellSize = Math.max(12, Math.floor(rect.height / targetRows));
-    columns = Math.max(1, Math.floor(rect.width / cellSize));
+    function init() {
+      dpr = Math.max(1, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    columnData = [];
-    for (let c = 0; c < columns; c++) {
-      const seed = (hash3(c, 17, Math.floor(Math.random() * 1e9)) | 1) >>> 0;
-      columnData.push({
-        seed,
-        y: Math.random() * (rect.height + cellSize * 20) - cellSize * 20,
-        speed: 0.45 + (seed % 100) / 140, // ~0.45 to ~1.16
-        length: 12 + (seed % 9),
-      });
+      cellSize = Math.max(minCell, Math.floor(rect.height / targetRows));
+      columns = Math.max(1, Math.floor(rect.width / cellSize));
+
+      columnData = [];
+      for (let c = 0; c < columns; c++) {
+        const seed = (hash3(c, 17, Math.floor(Math.random() * 1e9)) | 1) >>> 0;
+        columnData.push({
+          seed,
+          y: Math.random() * (rect.height + cellSize * 20) - cellSize * 20,
+          speed: 0.45 + (seed % 100) / 140,
+          length: 12 + (seed % 9),
+        });
+      }
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, rect.width, rect.height);
     }
+    init();
+    if (!columnData) return;
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, rect.width, rect.height);
-  }
-  init();
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(init, 200);
+    });
 
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(init, 200);
-  });
+    function tick() {
+      if (!columnData) return;
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
 
-  let frame = 0;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
 
-  function tick() {
-    const w = canvas.width / dpr;
-    const h = canvas.height / dpr;
+      const fontSize = Math.floor(cellSize * 0.78);
+      ctx.font = `${fontSize}px "Hiragino Sans", "Yu Gothic", "MS Gothic", sans-serif`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, w, h);
+      for (let c = 0; c < columns; c++) {
+        const col = columnData[c];
+        const headRow = Math.floor(col.y / cellSize);
+        const xCenter = c * cellSize + cellSize / 2;
 
-    const fontSize = Math.floor(cellSize * 0.78);
-    ctx.font = `${fontSize}px "Hiragino Sans", "Yu Gothic", "MS Gothic", sans-serif`;
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
+        for (let i = 0; i < col.length; i++) {
+          const row = headRow - i;
+          if (row < 0) continue;
+          const yCenter = row * cellSize + cellSize / 2;
+          if (yCenter < -cellSize || yCenter > h + cellSize) continue;
 
-    for (let c = 0; c < columns; c++) {
-      const col = columnData[c];
-      const headRow = Math.floor(col.y / cellSize);
-      const xCenter = c * cellSize + cellSize / 2;
+          const seedKey = i === 0
+            ? col.seed ^ Math.floor(frame / 3)
+            : col.seed;
+          const idx = hash3(c, row, seedKey) % TOTAL_GLYPHS;
+          const g = glyphAt(idx);
 
-      for (let i = 0; i < col.length; i++) {
-        const row = headRow - i;
-        if (row < 0) continue;
-        const yCenter = row * cellSize + cellSize / 2;
-        if (yCenter < -cellSize || yCenter > h + cellSize) continue;
+          ctx.fillStyle = trailColor(i);
 
-        const seedKey = i === 0
-          ? col.seed ^ Math.floor(frame / 3)
-          : col.seed;
-        const idx = hash3(c, row, seedKey) % TOTAL_GLYPHS;
-        const g = glyphAt(idx);
+          if (g.mirror) {
+            ctx.save();
+            ctx.translate(xCenter, yCenter);
+            ctx.scale(-1, 1);
+            ctx.fillText(g.ch, 0, 0);
+            ctx.restore();
+          } else {
+            ctx.fillText(g.ch, xCenter, yCenter);
+          }
+        }
 
-        ctx.fillStyle = trailColor(i);
-
-        if (g.mirror) {
-          ctx.save();
-          ctx.translate(xCenter, yCenter);
-          ctx.scale(-1, 1);
-          ctx.fillText(g.ch, 0, 0);
-          ctx.restore();
-        } else {
-          ctx.fillText(g.ch, xCenter, yCenter);
+        col.y += col.speed * (cellSize * 0.45);
+        if (col.y - col.length * cellSize > h) {
+          col.y = -Math.random() * cellSize * 20;
+          col.speed = 0.45 + (hash3(c, frame, col.seed) % 100) / 140;
+          col.length = 12 + (hash3(c, frame + 1, col.seed) % 9);
         }
       }
 
-      col.y += col.speed * (cellSize * 0.45);
-      if (col.y - col.length * cellSize > h) {
-        col.y = -Math.random() * cellSize * 20;
-        col.speed = 0.45 + (hash3(c, frame, col.seed) % 100) / 140;
-        col.length = 12 + (hash3(c, frame + 1, col.seed) % 9);
-      }
+      frame++;
     }
 
-    frame++;
-  }
+    if (reduceMotion) {
+      for (let f = 0; f < 40; f++) tick();
+      return;
+    }
 
-  if (reduceMotion) {
-    for (let f = 0; f < 40; f++) tick();
-    return;
-  }
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) visible = e.isIntersecting;
+      }, { rootMargin: '100px' });
+      io.observe(canvas);
+    }
 
-  let last = 0;
-  const interval = 50;
-  function loop(now) {
-    if (now - last >= interval) {
-      tick();
-      last = now;
+    let last = 0;
+    const interval = 50;
+    function loop(now) {
+      if (visible && now - last >= interval) {
+        tick();
+        last = now;
+      }
+      requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
+
+  function init() {
+    const canvases = document.querySelectorAll('.matrix-rain-canvas');
+    canvases.forEach(start);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
