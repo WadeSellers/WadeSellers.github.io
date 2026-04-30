@@ -270,6 +270,326 @@ nav a.active {
   margin-top: 12px;
 }
 
+/* ---- Live Card Thumbnails ---- */
+
+/* CouchWord — letter tiles fill in on hover */
+.thumb-couchword {
+  background: #1d1a18;
+  position: relative;
+}
+.thumb-couchword .cw-row {
+  display: flex;
+  gap: 6px;
+}
+.thumb-couchword .cw-tile {
+  width: 36px;
+  height: 36px;
+  background: #2a2624;
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, ui-serif, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+  position: relative;
+}
+.thumb-couchword .cw-tile::after {
+  content: attr(data-letter);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.project-card:hover .thumb-couchword .cw-tile::after { opacity: 1; }
+.project-card:hover .thumb-couchword .cw-tile:nth-child(1)::after { transition-delay: 0.05s; }
+.project-card:hover .thumb-couchword .cw-tile:nth-child(2)::after { transition-delay: 0.15s; }
+.project-card:hover .thumb-couchword .cw-tile:nth-child(3)::after { transition-delay: 0.25s; }
+.project-card:hover .thumb-couchword .cw-tile:nth-child(4)::after { transition-delay: 0.35s; }
+.project-card:hover .thumb-couchword .cw-tile:nth-child(5)::after { transition-delay: 0.45s; }
+
+/* AI Usage Meter — bars fill on hover */
+.thumb-ai-meter {
+  background: #1d1a18;
+  padding: 24px 28px;
+  align-items: stretch;
+}
+.thumb-ai-meter .meter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.thumb-ai-meter .meter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.thumb-ai-meter .meter-label {
+  width: 50px;
+  text-align: right;
+}
+.thumb-ai-meter .meter-track {
+  flex: 1;
+  height: 8px;
+  background: #2a2624;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.thumb-ai-meter .meter-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(.2,.8,.2,1);
+}
+.project-card:hover .thumb-ai-meter .meter-fill { width: var(--w); }
+
+/* Jellie & Tuna — cats hop */
+.thumb-jellie {
+  background: linear-gradient(180deg, #1d1a18 0%, #2a2018 100%);
+  position: relative;
+  overflow: hidden;
+}
+.thumb-jellie .ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24%;
+  background: #38241a;
+  border-top: 2px solid var(--accent);
+}
+.thumb-jellie .cat {
+  position: absolute;
+  bottom: 22%;
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.4));
+}
+.thumb-jellie .cat-jellie { left: 22%; }
+.thumb-jellie .cat-tuna { left: 58%; }
+@keyframes hop-a { 0%, 70%, 100% { transform: translateY(0); } 35% { transform: translateY(-22px); } }
+@keyframes hop-b { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-18px); } }
+.project-card:hover .thumb-jellie .cat-jellie { animation: hop-a 0.9s ease-in-out infinite; }
+.project-card:hover .thumb-jellie .cat-tuna { animation: hop-b 0.9s ease-in-out 0.2s infinite; }
+
+/* Budgeteer — equalizer bars */
+.thumb-budgeteer {
+  background: #1d1a18;
+}
+.thumb-budgeteer .eq {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  height: 60%;
+}
+.thumb-budgeteer .eq-bar {
+  width: 12px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  height: 28%;
+  opacity: 0.85;
+}
+.thumb-budgeteer .eq-bar:nth-child(2) { height: 56%; }
+.thumb-budgeteer .eq-bar:nth-child(3) { height: 78%; }
+.thumb-budgeteer .eq-bar:nth-child(4) { height: 92%; }
+.thumb-budgeteer .eq-bar:nth-child(5) { height: 64%; }
+.thumb-budgeteer .eq-bar:nth-child(6) { height: 40%; }
+.thumb-budgeteer .eq-bar:nth-child(7) { height: 22%; }
+@keyframes eq-pulse { 0%, 100% { transform: scaleY(0.55); } 50% { transform: scaleY(1); } }
+.thumb-budgeteer .eq-bar { transform-origin: bottom; }
+.project-card:hover .thumb-budgeteer .eq-bar { animation: eq-pulse 0.7s ease-in-out infinite; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(2) { animation-delay: 0.08s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(3) { animation-delay: 0.16s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(4) { animation-delay: 0.24s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(5) { animation-delay: 0.32s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(6) { animation-delay: 0.40s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(7) { animation-delay: 0.48s; }
+
+/* Cat Play — ball follows cursor */
+.thumb-catplay {
+  background: linear-gradient(180deg, #1f1d1c 0%, #2a2624 100%);
+  position: relative;
+  overflow: hidden;
+}
+.thumb-catplay .ball {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff5b8 0%, #d4d018 60%, #8a8800 100%);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset -3px -3px 6px rgba(0,0,0,0.2);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.18s cubic-bezier(.2,.8,.2,1), top 0.18s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Resurfacer — top card rises */
+.thumb-resurfacer {
+  background: #1d1a18;
+  perspective: 600px;
+}
+.thumb-resurfacer .link-stack {
+  position: relative;
+  width: 60%;
+  height: 65%;
+  transform-style: preserve-3d;
+}
+.thumb-resurfacer .link-card {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, white 0%);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1), opacity 0.4s ease;
+}
+.thumb-resurfacer .link-card:nth-child(1) { transform: translate(-12px, -12px) rotate(-4deg); opacity: 0.55; }
+.thumb-resurfacer .link-card:nth-child(2) { transform: translate(-4px, -4px) rotate(-1deg); opacity: 0.75; }
+.thumb-resurfacer .link-card:nth-child(3) { transform: translate(4px, 4px) rotate(2deg); opacity: 0.9; }
+.thumb-resurfacer .link-card:nth-child(4) { transform: translate(12px, 12px) rotate(5deg); }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(4) { transform: translate(12px, -28px) rotate(5deg); }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(3) { transform: translate(4px, -4px) rotate(2deg); }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(2) { transform: translate(-4px, 4px) rotate(-1deg); opacity: 0.85; }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(1) { transform: translate(-12px, 12px) rotate(-4deg); opacity: 0.7; }
+
+/* Desk Quotes — typewriter */
+.thumb-deskquotes {
+  background: #faf8f5;
+  font-family: Georgia, ui-serif, serif;
+}
+@media (prefers-color-scheme: dark) {
+  .thumb-deskquotes { background: #15120f; }
+}
+.thumb-deskquotes .dq-frame {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.thumb-deskquotes .dq-quote {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 6.5ch;
+  display: inline-block;
+}
+.thumb-deskquotes .dq-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: var(--accent);
+  margin-left: 4px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes type {
+  0% { width: 0; }
+  60% { width: 6.5ch; }
+  100% { width: 6.5ch; }
+}
+.project-card:hover .thumb-deskquotes .dq-quote { animation: type 1.4s steps(7, end); }
+
+/* Riddle Game Scoreboard */
+.thumb-riddle {
+  background: #15120f;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.thumb-riddle .board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.thumb-riddle .board-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+.thumb-riddle .board-num {
+  font-size: 3.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+}
+.project-card:hover .thumb-riddle .board-num { animation: tick 0.4s steps(8) forwards; }
+@keyframes tick {
+  0% { content: "23"; transform: translateY(0); }
+  20% { transform: translateY(-4px); }
+  40% { transform: translateY(0); }
+  60% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+/* Brickbreaker — bricks tremble, ball wakes */
+.thumb-brickbreaker {
+  background: #1d1a18;
+  position: relative;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 18px 24px 12px;
+}
+.thumb-brickbreaker .brick-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+  width: 100%;
+  margin-bottom: auto;
+}
+.thumb-brickbreaker .brick {
+  height: 12px;
+  background: var(--accent);
+  border-radius: 1px;
+  opacity: 0.85;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.thumb-brickbreaker .brick:nth-child(n+13) { background: var(--text-muted); opacity: 0.5; }
+.thumb-brickbreaker .brick:nth-child(n+7):nth-child(-n+12) { opacity: 0.7; }
+.thumb-brickbreaker .bb-paddle {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: transform 0.3s ease, left 0.3s cubic-bezier(.2,.8,.2,1);
+}
+.thumb-brickbreaker .bb-ball {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text);
+  transform: translateX(-50%);
+  transition: transform 0.3s ease, bottom 0.3s ease, left 0.3s ease;
+}
+.project-card:hover .thumb-brickbreaker .brick:nth-child(7) { opacity: 0; transform: scale(0.5); }
+.project-card:hover .thumb-brickbreaker .brick:nth-child(15) { opacity: 0; transform: scale(0.5); transition-delay: 0.15s; }
+.project-card:hover .thumb-brickbreaker .bb-ball { bottom: 60%; left: 60%; }
+.project-card:hover .thumb-brickbreaker .bb-paddle { left: 65%; }
+
+/* Reduced motion: hold static state */
+@media (prefers-reduced-motion: reduce) {
+  .project-card:hover .thumb-jellie .cat-jellie,
+  .project-card:hover .thumb-jellie .cat-tuna,
+  .project-card:hover .thumb-budgeteer .eq-bar,
+  .project-card:hover .thumb-deskquotes .dq-quote {
+    animation: none;
+  }
+  .thumb-couchword .cw-tile::after { opacity: 1; }
+  .thumb-ai-meter .meter-fill { width: var(--w); transition: none; }
+}
+
 /* ---- CTA Section ---- */
 .cta {
   padding: 56px 0;
