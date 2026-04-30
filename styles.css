@@ -16,7 +16,8 @@
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   --radius: 12px;
   --max-width: 1140px;
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Newsreader', Georgia, ui-serif, serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,13 +38,15 @@ html {
 }
 
 body {
-  font-family: var(--font);
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
   line-height: 1.7;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -121,10 +124,11 @@ nav a.active {
 }
 
 .hero h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  font-family: var(--font-serif);
+  font-size: 3.4rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   margin-bottom: 24px;
 }
 
@@ -254,9 +258,11 @@ nav a.active {
 }
 
 .cta h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
   margin-bottom: 12px;
 }
 
@@ -329,10 +335,12 @@ nav a.active {
 }
 
 .project-detail h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin-bottom: 12px;
 }
 
 .project-detail .meta {
@@ -368,9 +376,11 @@ nav a.active {
 }
 
 .contact h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
   margin-bottom: 16px;
 }
 
