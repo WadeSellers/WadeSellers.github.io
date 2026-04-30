@@ -21,12 +21,18 @@
     </div>
   </header>
 
-  <main class="contact">
+  <main class="not-found">
     <div class="container">
       <h1>Nothing here.</h1>
-      <p>This page doesn't exist. <a href="/">Head back to the projects.</a></p>
+      <p class="lead">This page doesn't exist. Play this instead.</p>
+      <div class="game-frame">
+        <canvas id="brickbreaker" width="720" height="480" aria-label="Brickbreaker game"></canvas>
+      </div>
+      <p class="game-hint">Move with your mouse. Click or tap to launch. <a href="/">Or go back to the projects &rarr;</a></p>
     </div>
   </main>
+
+  <script src="/brickbreaker.js" defer></script>
 
   <footer>
     <div class="container">
