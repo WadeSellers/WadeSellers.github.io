@@ -115,8 +115,8 @@
 
           <div class="project-card">
             <a href="/projects/matrix-screensaver.html">
-              <div class="thumb">
-                <img src="/images/matrix-screensaver-thumb.png" alt="Matrix Screensaver screenshot" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'placeholder-icon\'>&#x1F7E9;</span>'">
+              <div class="thumb thumb-matrix">
+                <canvas class="matrix-rain-canvas" data-min-cell="10" data-target-rows="20" aria-hidden="true"></canvas>
               </div>
               <div class="info">
                 <h3>Matrix Screensaver</h3>
@@ -190,6 +190,8 @@
       </div>
     </section>
   </main>
+
+  <script src="/matrix-rain.js" defer></script>
 
   <footer>
     <div class="container">
