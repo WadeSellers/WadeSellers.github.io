@@ -337,6 +337,17 @@ nav a.active {
   opacity: 0.4;
 }
 
+.project-hero .hero-img.matrix-rain-frame {
+  background: #080a08;
+  padding: 0;
+}
+
+.project-hero .hero-img.matrix-rain-frame canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .project-detail {
   padding-bottom: 80px;
 }
