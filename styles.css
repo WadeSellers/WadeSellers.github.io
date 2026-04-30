@@ -400,6 +400,50 @@ nav a.active {
   font-weight: 600;
 }
 
+/* ---- 404 / Brickbreaker ---- */
+.not-found {
+  padding: 56px 0 64px;
+  text-align: center;
+}
+
+.not-found h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.not-found .lead {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 32px;
+}
+
+.game-frame {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.game-frame canvas {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.not-found .game-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
 /* ---- Footer ---- */
 footer {
   margin-top: auto;
