@@ -1069,6 +1069,57 @@ nav a.active {
 }
 
 /* ---- Contact ---- */
+/* ---- /now page ---- */
+.now {
+  padding: 64px 0 80px;
+}
+
+.now h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 40px;
+}
+
+.now-body {
+  max-width: 600px;
+}
+
+.now-block {
+  margin-bottom: 36px;
+}
+
+.now-block h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.now-block p {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.now-footer {
+  margin-top: 48px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.now-footer a {
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.now-footer a:hover {
+  color: var(--text);
+}
+
+/* ---- contact ---- */
 .contact {
   padding: 64px 0;
 }
