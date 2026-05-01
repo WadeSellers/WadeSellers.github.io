@@ -364,7 +364,7 @@ nav a.active {
 }
 .project-card:hover .thumb-ai-meter .meter-fill { width: var(--w); }
 
-/* Jellie & Tuna — Mario-style scene */
+/* Jellie & Tuna — Mario-style scene with running cats */
 .thumb-jellie {
   background: #5c94fc;
   position: relative;
@@ -386,11 +386,22 @@ nav a.active {
     16px 0 0 -4px #fff;
   z-index: 1;
 }
-.thumb-jellie .cloud-1 { top: 18%; left: 14%; width: 28px; height: 10px; }
-.thumb-jellie .cloud-2 { top: 32%; right: 18%; width: 22px; height: 8px; opacity: 0.9; }
+.thumb-jellie .cloud-1 { top: 16%; left: 14%; width: 28px; height: 10px; }
+.thumb-jellie .cloud-2 { top: 28%; right: 22%; width: 22px; height: 8px; opacity: 0.9; }
+@keyframes cloud-drift-1 {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-200%); }
+}
+@keyframes cloud-drift-2 {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-300%); }
+}
+.project-card:hover .thumb-jellie .cloud-1 { animation: cloud-drift-1 12s linear infinite; }
+.project-card:hover .thumb-jellie .cloud-2 { animation: cloud-drift-2 16s linear infinite; }
+
 .thumb-jellie .qblock {
   position: absolute;
-  top: 36%;
+  top: 38%;
   left: 50%;
   transform: translateX(-50%);
   width: 22px;
@@ -408,6 +419,27 @@ nav a.active {
   z-index: 2;
   box-shadow: inset -2px -2px 0 #c08000, inset 2px 2px 0 #ffd440;
 }
+.thumb-jellie .coin {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  font-size: 14px;
+  z-index: 3;
+  opacity: 0;
+  transform: translate(-50%, 0);
+  filter: drop-shadow(0 0 4px #ffd440);
+}
+@keyframes qhit { 0%, 38%, 50%, 100% { transform: translateX(-50%) translateY(0); } 42% { transform: translateX(-50%) translateY(-6px); } }
+@keyframes coin-pop {
+  0%, 39% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
+  43% { opacity: 1; transform: translate(-50%, -22px) scale(1); }
+  60% { opacity: 1; transform: translate(-50%, -36px) scale(1); }
+  72% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
+  100% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
+}
+.project-card:hover .thumb-jellie .qblock { animation: qhit 5s ease-out infinite; }
+.project-card:hover .thumb-jellie .coin { animation: coin-pop 5s ease-out infinite; }
+
 .thumb-jellie .pipe {
   position: absolute;
   bottom: 22%;
@@ -435,14 +467,45 @@ nav a.active {
     inset 4px 0 0 #58d854,
     inset -4px 0 0 #007000;
 }
+.thumb-jellie .mushroom {
+  position: absolute;
+  bottom: 38%;
+  right: 6%;
+  font-size: 14px;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(0);
+}
+@keyframes mushroom-emerge {
+  0%, 80% { opacity: 0; transform: translateY(20px); }
+  85% { opacity: 1; transform: translateY(0); }
+  95% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0; transform: translateY(-2px); }
+}
+.project-card:hover .thumb-jellie .mushroom { animation: mushroom-emerge 5s ease-out infinite; }
+
+.thumb-jellie .goomba {
+  position: absolute;
+  bottom: 22%;
+  right: 0;
+  font-size: 14px;
+  z-index: 3;
+  opacity: 0;
+}
+@keyframes goomba-walk {
+  0%, 60% { opacity: 0; transform: translateX(0) scaleX(-1); }
+  62% { opacity: 1; transform: translateX(-4px) scaleX(-1); }
+  90% { opacity: 1; transform: translateX(-200px) scaleX(-1); }
+  100% { opacity: 0; transform: translateX(-220px) scaleX(-1); }
+}
+.project-card:hover .thumb-jellie .goomba { animation: goomba-walk 5s linear infinite; }
+
 .thumb-jellie .brick-floor {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 22%;
-  background:
-    linear-gradient(0deg, #c84c0c 0%, #c84c0c 100%);
   background-image:
     linear-gradient(90deg, transparent 0 calc(50% - 1px), #803000 calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
     linear-gradient(0deg, transparent 0 calc(50% - 1px), #803000 calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
@@ -452,21 +515,52 @@ nav a.active {
   border-top: 2px solid #803000;
   z-index: 2;
 }
-.thumb-jellie .cat {
+@keyframes ground-scroll {
+  0%   { background-position: 0 0, 8px 6px; }
+  100% { background-position: -32px 0, -24px 6px; }
+}
+.project-card:hover .thumb-jellie .brick-floor { animation: ground-scroll 0.8s linear infinite; }
+
+.thumb-jellie .cat-runner {
   position: absolute;
   bottom: 22%;
-  font-size: 1.4rem;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.5));
-  z-index: 3;
+  z-index: 4;
+  transform: translateX(-40px);
 }
-.thumb-jellie .cat-jellie { left: 18%; }
-.thumb-jellie .cat-tuna { left: 36%; }
-@keyframes mario-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-9px) rotate(3deg); } }
-@keyframes mario-bob-b { 0%, 100% { transform: translateY(-2px) rotate(3deg); } 50% { transform: translateY(-11px) rotate(-3deg); } }
-@keyframes qbounce { 0%, 90%, 100% { transform: translateX(-50%) translateY(0); } 95% { transform: translateX(-50%) translateY(-4px); } }
-.project-card:hover .thumb-jellie .cat-jellie { animation: mario-bob 0.42s ease-in-out infinite; }
-.project-card:hover .thumb-jellie .cat-tuna { animation: mario-bob-b 0.42s ease-in-out 0.1s infinite; }
-.project-card:hover .thumb-jellie .qblock { animation: qbounce 2.4s ease-in-out infinite; }
+.thumb-jellie .cat {
+  display: inline-block;
+  font-size: 1.3rem;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.5));
+  transform-origin: bottom center;
+}
+.thumb-jellie .runner-1 { left: 0; }
+.thumb-jellie .runner-2 { left: 0; }
+
+/* Cat 1: enters from left, jumps over qblock at midpoint, exits right */
+@keyframes runner1-x {
+  0%   { transform: translateX(-40px); }
+  35%  { transform: translateX(120px); }
+  50%  { transform: translateX(150px); }
+  100% { transform: translateX(360px); }
+}
+@keyframes runner1-y {
+  0%, 30%, 55%, 100% { transform: translateY(0); }
+  42% { transform: translateY(-32px); }
+}
+/* Cat 2: trails behind cat 1 */
+@keyframes runner2-x {
+  0%   { transform: translateX(-90px); }
+  100% { transform: translateX(310px); }
+}
+@keyframes cat-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg) scaleX(1); }
+  50%      { transform: translateY(-3px) rotate(4deg) scaleX(1); }
+}
+
+.project-card:hover .thumb-jellie .runner-1 { animation: runner1-x 5s linear infinite; }
+.project-card:hover .thumb-jellie .runner-1 .cat { animation: runner1-y 5s ease-in-out infinite, cat-bob 0.28s ease-in-out infinite; }
+.project-card:hover .thumb-jellie .runner-2 { animation: runner2-x 5s linear infinite; }
+.project-card:hover .thumb-jellie .runner-2 .cat { animation: cat-bob 0.32s ease-in-out 0.1s infinite; }
 
 /* Budgeteer — voice transcript types in, then amount pops up */
 .thumb-budgeteer {
@@ -666,27 +760,18 @@ nav a.active {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 35%, rgba(255,255,255,0.4) 0%, transparent 40%),
-    linear-gradient(135deg, #4a4640 0%, #2a2624 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: rgba(255, 250, 235, 0.85);
-  filter: grayscale(1);
-  border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  font-family: Georgia, ui-serif, serif;
-  font-style: italic;
-  letter-spacing: 0.05em;
+  background-color: #4a4640;
+  background-size: cover;
+  background-position: center 20%;
+  filter: grayscale(1) contrast(1.05);
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   justify-self: end;
-  max-width: 78%;
+  max-width: 80%;
 }
-.thumb-deskquotes .dq-portrait::after {
-  content: attr(data-initial);
-}
+.thumb-deskquotes .dq-s1 .dq-portrait { background-image: url('/images/quotes/einstein.jpg'); }
+.thumb-deskquotes .dq-s2 .dq-portrait { background-image: url('/images/quotes/socrates.jpg'); background-position: center 25%; }
+.thumb-deskquotes .dq-s3 .dq-portrait { background-image: url('/images/quotes/turing.jpg'); }
 .thumb-deskquotes .dq-text {
   display: flex;
   flex-direction: column;
