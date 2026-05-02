@@ -16,13 +16,14 @@
     let cursorX = -1, cursorY = -1;
     let inside = false;
     let raf;
+    let wxT = 0, wyT = 0, wFrames = 0;
 
     function size() {
       const r = thumb.getBoundingClientRect();
       bx = r.width / 2;
       by = r.height / 2;
-      tx = bx;
-      ty = by;
+      tx = bx; ty = by;
+      wxT = bx; wyT = by;
     }
     size();
     window.addEventListener('resize', size);
@@ -63,8 +64,14 @@
           ty = by + (dy / dist) * force * 5;
         }
       } else {
-        tx += (W / 2 - tx) * 0.06;
-        ty += (H / 2 - ty) * 0.06;
+        if (--wFrames <= 0) {
+          const pad = 20;
+          wxT = pad + Math.random() * (W - pad * 2);
+          wyT = pad + Math.random() * (H - pad * 2);
+          wFrames = 70 + Math.floor(Math.random() * 70);
+        }
+        tx += (wxT - tx) * 0.04;
+        ty += (wyT - ty) * 0.04;
       }
 
       tx = Math.max(16, Math.min(W - 16, tx));
@@ -343,11 +350,32 @@
     });
   }
 
+  // ---- Mobile: fire card animations as cards scroll into view ----
+  function setupMobileAutoplay() {
+    if (!window.matchMedia('(hover: none)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+    const cards = document.querySelectorAll('.project-card');
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const card = entry.target;
+        if (entry.isIntersecting) {
+          card.classList.add('card-active');
+          card.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        } else {
+          card.classList.remove('card-active');
+          card.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+        }
+      }
+    }, { threshold: 0.4 });
+    cards.forEach((card) => io.observe(card));
+  }
+
   function init() {
     setupCatPlay();
     setupMeter();
     setupRiddle();
     setupBrickbreaker();
+    setupMobileAutoplay();
   }
 
   if (document.readyState === 'loading') {
