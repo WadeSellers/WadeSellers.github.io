@@ -375,214 +375,106 @@ nav a.active {
 .project-card:hover .thumb-ai-meter .meter-fill,
 .project-card.card-active .thumb-ai-meter .meter-fill{ width: var(--w); }
 
-/* Jellie & Tuna — Mario-style scene with running cats */
-.thumb-jellie {
-  background: #5c94fc;
+/* Jellie & Tuna — actual game art (Living Room level) */
+.project-card .thumb-jellie {
+  background: linear-gradient(180deg, #f5dfb3 0%, #e2bb84 70%, #d9a672 100%);
   position: relative;
   overflow: hidden;
 }
-.thumb-jellie .sky {
+.thumb-jellie .jt-floor {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #5c94fc 0%, #7eaeff 60%, #a8c8ff 100%);
-}
-.thumb-jellie .cloud {
-  position: absolute;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow:
-    -8px -2px 0 -2px #fff,
-    8px -2px 0 -2px #fff,
-    -16px 0 0 -4px #fff,
-    16px 0 0 -4px #fff;
+  left: 0; right: 0; bottom: 0;
+  height: 22px;
+  background: #8c5a32;
+  border-top: 2px solid #5e3a1f;
   z-index: 1;
 }
-.thumb-jellie .cloud-1 { top: 16%; left: 14%; width: 28px; height: 10px; }
-.thumb-jellie .cloud-2 { top: 28%; right: 22%; width: 22px; height: 8px; opacity: 0.9; }
-@keyframes cloud-drift-1 {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-200%); }
-}
-@keyframes cloud-drift-2 {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-300%); }
-}
-.project-card:hover .thumb-jellie .cloud-1,
-.project-card.card-active .thumb-jellie .cloud-1{ animation: cloud-drift-1 12s linear infinite; }
-.project-card:hover .thumb-jellie .cloud-2,
-.project-card.card-active .thumb-jellie .cloud-2{ animation: cloud-drift-2 16s linear infinite; }
-
-.thumb-jellie .qblock {
-  position: absolute;
-  top: 38%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 22px;
-  background: #f8b800;
-  border: 2px solid #803000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-weight: 700;
-  font-size: 13px;
-  color: #fff;
-  text-shadow: 1px 1px 0 #803000;
-  z-index: 2;
-  box-shadow: inset -2px -2px 0 #c08000, inset 2px 2px 0 #ffd440;
-}
-.thumb-jellie .coin {
-  position: absolute;
-  top: 38%;
-  left: 50%;
-  font-size: 14px;
-  z-index: 3;
-  opacity: 0;
-  transform: translate(-50%, 0);
-  filter: drop-shadow(0 0 4px #ffd440);
-}
-@keyframes qhit { 0%, 38%, 50%, 100% { transform: translateX(-50%) translateY(0); } 42% { transform: translateX(-50%) translateY(-6px); } }
-@keyframes coin-pop {
-  0%, 39% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
-  43% { opacity: 1; transform: translate(-50%, -22px) scale(1); }
-  60% { opacity: 1; transform: translate(-50%, -36px) scale(1); }
-  72% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
-  100% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
-}
-.project-card:hover .thumb-jellie .qblock,
-.project-card.card-active .thumb-jellie .qblock{ animation: qhit 5s ease-out infinite; }
-.project-card:hover .thumb-jellie .coin,
-.project-card.card-active .thumb-jellie .coin{ animation: coin-pop 5s ease-out infinite; }
-
-.thumb-jellie .pipe {
-  position: absolute;
-  bottom: 22%;
-  right: 8%;
-  width: 26px;
-  height: 22px;
-  background: #00a800;
-  border: 2px solid #003800;
-  border-bottom: none;
-  z-index: 2;
-  box-shadow:
-    inset 4px 0 0 #58d854,
-    inset -4px 0 0 #007000;
-}
-.thumb-jellie .pipe::before {
+.thumb-jellie .jt-floor::before {
   content: '';
   position: absolute;
-  top: -6px;
-  left: -4px;
-  right: -4px;
-  height: 6px;
-  background: #00a800;
-  border: 2px solid #003800;
-  box-shadow:
-    inset 4px 0 0 #58d854,
-    inset -4px 0 0 #007000;
-}
-.thumb-jellie .mushroom {
-  position: absolute;
-  bottom: 38%;
-  right: 6%;
-  font-size: 14px;
-  z-index: 1;
-  opacity: 0;
-  transform: translateY(0);
-}
-@keyframes mushroom-emerge {
-  0%, 80% { opacity: 0; transform: translateY(20px); }
-  85% { opacity: 1; transform: translateY(0); }
-  95% { opacity: 1; transform: translateY(-2px); }
-  100% { opacity: 0; transform: translateY(-2px); }
-}
-.project-card:hover .thumb-jellie .mushroom,
-.project-card.card-active .thumb-jellie .mushroom{ animation: mushroom-emerge 5s ease-out infinite; }
-
-.thumb-jellie .goomba {
-  position: absolute;
-  bottom: 22%;
-  right: 0;
-  font-size: 14px;
-  z-index: 3;
-  opacity: 0;
-}
-@keyframes goomba-walk {
-  0%, 60% { opacity: 0; transform: translateX(0) scaleX(-1); }
-  62% { opacity: 1; transform: translateX(-4px) scaleX(-1); }
-  90% { opacity: 1; transform: translateX(-200px) scaleX(-1); }
-  100% { opacity: 0; transform: translateX(-220px) scaleX(-1); }
-}
-.project-card:hover .thumb-jellie .goomba,
-.project-card.card-active .thumb-jellie .goomba{ animation: goomba-walk 5s linear infinite; }
-
-.thumb-jellie .brick-floor {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 22%;
+  inset: 0;
   background-image:
-    linear-gradient(90deg, transparent 0 calc(50% - 1px), #803000 calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
-    linear-gradient(0deg, transparent 0 calc(50% - 1px), #803000 calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
-  background-size: 16px 12px, 16px 12px;
-  background-position: 0 0, 8px 6px;
-  background-color: #c84c0c;
-  border-top: 2px solid #803000;
-  z-index: 2;
+    repeating-linear-gradient(90deg, transparent 0, transparent 13px, rgba(94,58,31,0.5) 13px, rgba(94,58,31,0.5) 14px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 9px, rgba(94,58,31,0.5) 9px, rgba(94,58,31,0.5) 10px);
 }
-@keyframes ground-scroll {
-  0%   { background-position: 0 0, 8px 6px; }
-  100% { background-position: -32px 0, -24px 6px; }
-}
-.project-card:hover .thumb-jellie .brick-floor,
-.project-card.card-active .thumb-jellie .brick-floor{ animation: ground-scroll 0.8s linear infinite; }
-
-.thumb-jellie .cat-runner {
+/* Catnip leaves bobbing in the air (high specificity to defeat global .thumb img rule) */
+.project-card .thumb-jellie img.jt-catnip {
   position: absolute;
-  bottom: 22%;
-  z-index: 4;
-  transform: translateX(-40px);
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  z-index: 2;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.18));
 }
-.thumb-jellie .cat {
-  display: inline-block;
-  font-size: 1.3rem;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.5));
-  transform-origin: bottom center;
+.thumb-jellie .jt-catnip-1 { left: 22%; bottom: 42%; }
+.thumb-jellie .jt-catnip-2 { left: 50%; bottom: 56%; }
+.thumb-jellie .jt-catnip-3 { left: 76%; bottom: 40%; }
+@keyframes jt-catnip-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-3px) rotate(3deg); }
 }
-.thumb-jellie .runner-1 { left: 0; }
-.thumb-jellie .runner-2 { left: 0; }
+.project-card:hover .thumb-jellie .jt-catnip,
+.project-card.card-active .thumb-jellie .jt-catnip{ animation: jt-catnip-bob 1.5s ease-in-out infinite; }
+.project-card:hover .thumb-jellie .jt-catnip-2,
+.project-card.card-active .thumb-jellie .jt-catnip-2{ animation-delay: -0.5s; }
+.project-card:hover .thumb-jellie .jt-catnip-3,
+.project-card.card-active .thumb-jellie .jt-catnip-3{ animation-delay: -1s; }
 
-/* Cat 1: enters from left, jumps over qblock at midpoint, exits right */
-@keyframes runner1-x {
-  0%   { transform: translateX(-40px); }
-  35%  { transform: translateX(120px); }
-  50%  { transform: translateX(150px); }
-  100% { transform: translateX(360px); }
+/* Cats: pixel-art sprites running across */
+.thumb-jellie .jt-cat {
+  position: absolute;
+  bottom: 22px;
+  left: -25%;
+  width: 56px;
+  height: 38px;
+  z-index: 3;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2));
 }
-@keyframes runner1-y {
-  0%, 30%, 55%, 100% { transform: translateY(0); }
-  42% { transform: translateY(-32px); }
+.thumb-jellie .jt-cat > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
 }
-/* Cat 2: trails behind cat 1 */
-@keyframes runner2-x {
-  0%   { transform: translateX(-90px); }
-  100% { transform: translateX(310px); }
+.thumb-jellie .jt-cat .jt-frame {
+  opacity: 0;
 }
-@keyframes cat-bob {
-  0%, 100% { transform: translateY(0) rotate(-4deg) scaleX(1); }
-  50%      { transform: translateY(-3px) rotate(4deg) scaleX(1); }
+@keyframes jt-runner-x {
+  0%   { left: -25%; }
+  100% { left: 110%; }
 }
-
-.project-card:hover .thumb-jellie .runner-1,
-.project-card.card-active .thumb-jellie .runner-1{ animation: runner1-x 5s linear infinite; }
-.project-card:hover .thumb-jellie .runner-1 .cat,
-.project-card.card-active .thumb-jellie .runner-1 .cat{ animation: runner1-y 5s ease-in-out infinite, cat-bob 0.28s ease-in-out infinite; }
-.project-card:hover .thumb-jellie .runner-2,
-.project-card.card-active .thumb-jellie .runner-2{ animation: runner2-x 5s linear infinite; }
-.project-card:hover .thumb-jellie .runner-2 .cat,
-.project-card.card-active .thumb-jellie .runner-2 .cat{ animation: cat-bob 0.32s ease-in-out 0.1s infinite; }
+@keyframes jt-cat-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes jt-show-frame {
+  0%, 24%   { opacity: 1; }
+  25%, 100% { opacity: 0; }
+}
+.project-card:hover .thumb-jellie .jt-jellie,
+.project-card.card-active .thumb-jellie .jt-jellie{
+  animation: jt-runner-x 5s linear infinite, jt-cat-bob 0.32s ease-in-out infinite;
+}
+.project-card:hover .thumb-jellie .jt-tuna,
+.project-card.card-active .thumb-jellie .jt-tuna{
+  animation: jt-runner-x 5s linear -1.6s infinite, jt-cat-bob 0.36s ease-in-out infinite;
+}
+.project-card:hover .thumb-jellie .jt-frame,
+.project-card.card-active .thumb-jellie .jt-frame{
+  animation: jt-show-frame 0.32s step-end infinite;
+}
+.project-card:hover .thumb-jellie .jt-f1,
+.project-card.card-active .thumb-jellie .jt-f1{ animation-delay: 0s; }
+.project-card:hover .thumb-jellie .jt-f2,
+.project-card.card-active .thumb-jellie .jt-f2{ animation-delay: -0.24s; }
+.project-card:hover .thumb-jellie .jt-f3,
+.project-card.card-active .thumb-jellie .jt-f3{ animation-delay: -0.16s; }
+.project-card:hover .thumb-jellie .jt-f4,
+.project-card.card-active .thumb-jellie .jt-f4{ animation-delay: -0.08s; }
 
 /* Budgeteer — voice transcript types in, then amount pops up */
 .thumb-budgeteer {
@@ -966,12 +858,14 @@ nav a.active {
 
 /* Reduced motion: stop card animations and hold final state */
 @media (prefers-reduced-motion: reduce) {
-  .project-card:hover .thumb-jellie .cat-jellie,
-.project-card.card-active .thumb-jellie .cat-jellie,
-  .project-card:hover .thumb-jellie .cat-tuna,
-.project-card.card-active .thumb-jellie .cat-tuna,
-  .project-card:hover .thumb-jellie .qblock,
-.project-card.card-active .thumb-jellie .qblock,
+  .project-card:hover .thumb-jellie .jt-jellie,
+.project-card.card-active .thumb-jellie .jt-jellie,
+  .project-card:hover .thumb-jellie .jt-tuna,
+.project-card.card-active .thumb-jellie .jt-tuna,
+  .project-card:hover .thumb-jellie .jt-frame,
+.project-card.card-active .thumb-jellie .jt-frame,
+  .project-card:hover .thumb-jellie .jt-catnip,
+.project-card.card-active .thumb-jellie .jt-catnip,
   .project-card:hover .thumb-budgeteer .eq-bar,
 .project-card.card-active .thumb-budgeteer .eq-bar,
   .project-card:hover .thumb-deskquotes .dq-s1,
