@@ -1,29 +1,37 @@
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---- Cat Play: ball runs AWAY from cursor ----
+  // ---- Cat Play: manic bouncing ball, cat face with tracking slit pupils ----
   function setupCatPlay() {
     const thumb = document.querySelector('.thumb-catplay');
     if (!thumb) return;
     const ball = thumb.querySelector('.ball');
     const trails = thumb.querySelectorAll('.ball-trail');
-    const eye = thumb.querySelector('.cat-eye');
+    const faceEl = thumb.querySelector('.cat-face');
+    const eyes = faceEl ? Array.from(faceEl.querySelectorAll('.cf-eye')) : [];
     const card = thumb.closest('.project-card');
     if (!ball || !card) return;
 
-    let bx = 0, by = 0;
-    let tx = 0, ty = 0;
+    let bx = 0, by = 0, vx = 0, vy = 0;
     let cursorX = -1, cursorY = -1;
     let inside = false;
     let raf;
-    let wxT = 0, wyT = 0, wFrames = 0;
+    let kickTimer = 0;
+
+    function kick() {
+      const angle = Math.random() * Math.PI * 2;
+      const spd = 4 + Math.random() * 5;
+      vx += Math.cos(angle) * spd;
+      vy += Math.sin(angle) * spd;
+      kickTimer = 22 + Math.floor(Math.random() * 44);
+    }
 
     function size() {
       const r = thumb.getBoundingClientRect();
       bx = r.width / 2;
-      by = r.height / 2;
-      tx = bx; ty = by;
-      wxT = bx; wyT = by;
+      by = r.height / 3;
+      vx = 0; vy = 0;
+      kick();
     }
     size();
     window.addEventListener('resize', size);
@@ -35,16 +43,20 @@
         t.style.left = bx + 'px';
         t.style.top = by + 'px';
       });
-      if (eye) {
-        const eyeR = eye.getBoundingClientRect();
+      if (faceEl && eyes.length) {
+        const fR = faceEl.getBoundingClientRect();
         const tR = thumb.getBoundingClientRect();
-        const ecx = eyeR.left - tR.left + eyeR.width / 2;
-        const ecy = eyeR.top - tR.top + eyeR.height / 2;
-        const dx = bx - ecx;
-        const dy = by - ecy;
+        const fcx = fR.left - tR.left + fR.width / 2;
+        const fcy = fR.top - tR.top + fR.height / 2;
+        const dx = bx - fcx;
+        const dy = by - fcy;
         const len = Math.max(1, Math.hypot(dx, dy));
-        eye.style.setProperty('--ex', (dx / len) * 1.6 + 'px');
-        eye.style.setProperty('--ey', (dy / len) * 1.6 + 'px');
+        const ex = (dx / len) * 2;
+        const ey = (dy / len) * 2;
+        eyes.forEach((e) => {
+          e.style.setProperty('--ex', ex + 'px');
+          e.style.setProperty('--ey', ey + 'px');
+        });
       }
     }
 
@@ -52,33 +64,33 @@
       const r = thumb.getBoundingClientRect();
       const W = r.width;
       const H = r.height;
+      const rad = 14;
 
       if (inside && cursorX >= 0) {
         const dx = bx - cursorX;
         const dy = by - cursorY;
         const dist = Math.max(1, Math.hypot(dx, dy));
-        const fleeRange = 90;
-        if (dist < fleeRange) {
-          const force = (1 - dist / fleeRange) * 5.5;
-          tx = bx + (dx / dist) * force * 5;
-          ty = by + (dy / dist) * force * 5;
+        if (dist < 90) {
+          const f = (1 - dist / 90) * 2;
+          vx += (dx / dist) * f;
+          vy += (dy / dist) * f;
         }
-      } else {
-        if (--wFrames <= 0) {
-          const pad = 20;
-          wxT = pad + Math.random() * (W - pad * 2);
-          wyT = pad + Math.random() * (H - pad * 2);
-          wFrames = 70 + Math.floor(Math.random() * 70);
-        }
-        tx += (wxT - tx) * 0.04;
-        ty += (wyT - ty) * 0.04;
       }
 
-      tx = Math.max(16, Math.min(W - 16, tx));
-      ty = Math.max(16, Math.min(H - 16, ty));
+      if (--kickTimer <= 0) kick();
 
-      bx += (tx - bx) * 0.18;
-      by += (ty - by) * 0.18;
+      const spd = Math.hypot(vx, vy);
+      const maxSpd = 11, minSpd = 2.5;
+      if (spd > maxSpd) { vx = (vx / spd) * maxSpd; vy = (vy / spd) * maxSpd; }
+      if (spd > 0 && spd < minSpd) { vx = (vx / spd) * minSpd; vy = (vy / spd) * minSpd; }
+
+      vx *= 0.97; vy *= 0.97;
+      bx += vx; by += vy;
+
+      if (bx < rad)     { bx = rad;     vx =  Math.abs(vx) * (0.85 + Math.random() * 0.3); vy += (Math.random() - 0.5) * 1.5; }
+      if (bx > W - rad) { bx = W - rad; vx = -Math.abs(vx) * (0.85 + Math.random() * 0.3); vy += (Math.random() - 0.5) * 1.5; }
+      if (by < rad)     { by = rad;     vy =  Math.abs(vy) * (0.85 + Math.random() * 0.3); vx += (Math.random() - 0.5) * 1.5; }
+      if (by > H - rad) { by = H - rad; vy = -Math.abs(vy) * (0.85 + Math.random() * 0.3); vx += (Math.random() - 0.5) * 1.5; }
 
       paint();
       raf = requestAnimationFrame(step);
@@ -90,9 +102,7 @@
       cursorY = e.clientY - r.top;
       inside = true;
     });
-    card.addEventListener('mouseleave', () => {
-      inside = false;
-    });
+    card.addEventListener('mouseleave', () => { inside = false; });
 
     paint();
     if (!reduce) raf = requestAnimationFrame(step);

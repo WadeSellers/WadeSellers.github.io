@@ -687,30 +687,78 @@ nav a.active {
 .thumb-catplay .ball-trail.t1 { transition-duration: 0.22s; opacity: 0.55; transform: translate(-50%, -50%) scale(0.85); }
 .thumb-catplay .ball-trail.t2 { transition-duration: 0.32s; opacity: 0.32; transform: translate(-50%, -50%) scale(0.7); }
 .thumb-catplay .ball-trail.t3 { transition-duration: 0.45s; opacity: 0.16; transform: translate(-50%, -50%) scale(0.55); }
-.thumb-catplay .cat-eye {
+/* Cat face */
+.thumb-catplay .cat-face {
   position: absolute;
-  bottom: 12px;
-  left: 14px;
-  width: 28px;
-  height: 16px;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 62px;
+  height: 52px;
   background: #2a2624;
-  border-radius: 50% 50% 14px 14px / 65% 65% 16px 16px;
-  border: 1px solid var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 50% 50% 44% 44% / 58% 58% 42% 42%;
   z-index: 2;
 }
-.thumb-catplay .cat-eye::before,
-.thumb-catplay .cat-eye::after {
+/* Ears */
+.thumb-catplay .cf-ear {
+  position: absolute;
+  top: -15px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 9px 16px 9px;
+  border-color: transparent transparent var(--accent) transparent;
+}
+.thumb-catplay .cf-ear::after {
   content: '';
   position: absolute;
-  top: 3px;
-  width: 5px;
-  height: 7px;
-  background: #fff5b8;
-  border-radius: 50%;
-  transition: transform 0.18s ease;
+  top: 5px;
+  left: -4px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 4px 9px 4px;
+  border-color: transparent transparent color-mix(in srgb, var(--accent) 28%, #2a2624) transparent;
 }
-.thumb-catplay .cat-eye::before { left: 5px; transform: translate(var(--ex, 0), var(--ey, 0)); }
-.thumb-catplay .cat-eye::after { right: 5px; transform: translate(var(--ex, 0), var(--ey, 0)); }
+.thumb-catplay .cf-ear-l { left: 5px; }
+.thumb-catplay .cf-ear-r { right: 5px; }
+/* Eyes — yellow-green iris, vertical slit pupil */
+.thumb-catplay .cf-eye {
+  position: absolute;
+  top: 13px;
+  width: 14px;
+  height: 16px;
+  background: #b8cc30;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.thumb-catplay .cf-eye-l { left: 10px; }
+.thumb-catplay .cf-eye-r { right: 10px; }
+.thumb-catplay .cf-eye::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 12px;
+  background: #111;
+  border-radius: 50%;
+  transform: translate(calc(-50% + var(--ex, 0px)), calc(-50% + var(--ey, 0px)));
+  transition: transform 0.08s ease;
+}
+/* Nose */
+.thumb-catplay .cf-nose {
+  position: absolute;
+  bottom: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: #d06070 transparent transparent transparent;
+}
 
 /* Resurfacer — link cards with content */
 .thumb-resurfacer {
@@ -951,8 +999,8 @@ nav a.active {
 }
 .thumb-brickbreaker .bb-score {
   position: absolute;
-  top: 8px;
-  right: 14px;
+  top: 6px;
+  right: 10px;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 0.62rem;
   color: var(--accent);
@@ -960,6 +1008,10 @@ nav a.active {
   font-variant-numeric: tabular-nums;
   opacity: 0;
   transition: opacity 0.3s ease 0.2s;
+  z-index: 5;
+  background: rgba(29, 26, 24, 0.85);
+  padding: 1px 4px;
+  border-radius: 2px;
 }
 .project-card:hover .thumb-brickbreaker .bb-score,
 .project-card.card-active .thumb-brickbreaker .bb-score{ opacity: 1; }
