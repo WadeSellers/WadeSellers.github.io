@@ -189,7 +189,8 @@ nav a.active {
   counter-increment: project;
 }
 
-.project-card:hover {
+.project-card:hover,
+.project-card.card-active{
   transform: translateY(-4px);
   box-shadow: var(--shadow);
 }
@@ -307,15 +308,24 @@ nav a.active {
   transform: scale(0.7);
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
-.project-card:hover .thumb-couchword .cw-tile::after { opacity: 1; transform: scale(1); }
-.project-card:hover .thumb-couchword .cw-tile[data-step="1"]::after { transition-delay: 0.05s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="2"]::after { transition-delay: 0.16s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="3"]::after { transition-delay: 0.27s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="4"]::after { transition-delay: 0.38s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="5"]::after { transition-delay: 0.49s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="6"]::after { transition-delay: 0.66s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="7"]::after { transition-delay: 0.77s; }
-.project-card:hover .thumb-couchword .cw-tile[data-step="8"]::after { transition-delay: 0.88s; }
+.project-card:hover .thumb-couchword .cw-tile::after,
+.project-card.card-active .thumb-couchword .cw-tile::after{ opacity: 1; transform: scale(1); }
+.project-card:hover .thumb-couchword .cw-tile[data-step="1"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="1"]::after{ transition-delay: 0.05s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="2"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="2"]::after{ transition-delay: 0.16s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="3"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="3"]::after{ transition-delay: 0.27s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="4"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="4"]::after{ transition-delay: 0.38s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="5"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="5"]::after{ transition-delay: 0.49s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="6"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="6"]::after{ transition-delay: 0.66s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="7"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="7"]::after{ transition-delay: 0.77s; }
+.project-card:hover .thumb-couchword .cw-tile[data-step="8"]::after,
+.project-card.card-active .thumb-couchword .cw-tile[data-step="8"]::after{ transition-delay: 0.88s; }
 
 /* AI Usage Meter — three bars + JS-driven percentage ticker */
 .thumb-ai-meter {
@@ -362,7 +372,8 @@ nav a.active {
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
-.project-card:hover .thumb-ai-meter .meter-fill { width: var(--w); }
+.project-card:hover .thumb-ai-meter .meter-fill,
+.project-card.card-active .thumb-ai-meter .meter-fill{ width: var(--w); }
 
 /* Jellie & Tuna — Mario-style scene with running cats */
 .thumb-jellie {
@@ -396,8 +407,10 @@ nav a.active {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-300%); }
 }
-.project-card:hover .thumb-jellie .cloud-1 { animation: cloud-drift-1 12s linear infinite; }
-.project-card:hover .thumb-jellie .cloud-2 { animation: cloud-drift-2 16s linear infinite; }
+.project-card:hover .thumb-jellie .cloud-1,
+.project-card.card-active .thumb-jellie .cloud-1{ animation: cloud-drift-1 12s linear infinite; }
+.project-card:hover .thumb-jellie .cloud-2,
+.project-card.card-active .thumb-jellie .cloud-2{ animation: cloud-drift-2 16s linear infinite; }
 
 .thumb-jellie .qblock {
   position: absolute;
@@ -437,8 +450,10 @@ nav a.active {
   72% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
   100% { opacity: 0; transform: translate(-50%, -44px) scale(0.9); }
 }
-.project-card:hover .thumb-jellie .qblock { animation: qhit 5s ease-out infinite; }
-.project-card:hover .thumb-jellie .coin { animation: coin-pop 5s ease-out infinite; }
+.project-card:hover .thumb-jellie .qblock,
+.project-card.card-active .thumb-jellie .qblock{ animation: qhit 5s ease-out infinite; }
+.project-card:hover .thumb-jellie .coin,
+.project-card.card-active .thumb-jellie .coin{ animation: coin-pop 5s ease-out infinite; }
 
 .thumb-jellie .pipe {
   position: absolute;
@@ -482,7 +497,8 @@ nav a.active {
   95% { opacity: 1; transform: translateY(-2px); }
   100% { opacity: 0; transform: translateY(-2px); }
 }
-.project-card:hover .thumb-jellie .mushroom { animation: mushroom-emerge 5s ease-out infinite; }
+.project-card:hover .thumb-jellie .mushroom,
+.project-card.card-active .thumb-jellie .mushroom{ animation: mushroom-emerge 5s ease-out infinite; }
 
 .thumb-jellie .goomba {
   position: absolute;
@@ -498,7 +514,8 @@ nav a.active {
   90% { opacity: 1; transform: translateX(-200px) scaleX(-1); }
   100% { opacity: 0; transform: translateX(-220px) scaleX(-1); }
 }
-.project-card:hover .thumb-jellie .goomba { animation: goomba-walk 5s linear infinite; }
+.project-card:hover .thumb-jellie .goomba,
+.project-card.card-active .thumb-jellie .goomba{ animation: goomba-walk 5s linear infinite; }
 
 .thumb-jellie .brick-floor {
   position: absolute;
@@ -519,7 +536,8 @@ nav a.active {
   0%   { background-position: 0 0, 8px 6px; }
   100% { background-position: -32px 0, -24px 6px; }
 }
-.project-card:hover .thumb-jellie .brick-floor { animation: ground-scroll 0.8s linear infinite; }
+.project-card:hover .thumb-jellie .brick-floor,
+.project-card.card-active .thumb-jellie .brick-floor{ animation: ground-scroll 0.8s linear infinite; }
 
 .thumb-jellie .cat-runner {
   position: absolute;
@@ -557,10 +575,14 @@ nav a.active {
   50%      { transform: translateY(-3px) rotate(4deg) scaleX(1); }
 }
 
-.project-card:hover .thumb-jellie .runner-1 { animation: runner1-x 5s linear infinite; }
-.project-card:hover .thumb-jellie .runner-1 .cat { animation: runner1-y 5s ease-in-out infinite, cat-bob 0.28s ease-in-out infinite; }
-.project-card:hover .thumb-jellie .runner-2 { animation: runner2-x 5s linear infinite; }
-.project-card:hover .thumb-jellie .runner-2 .cat { animation: cat-bob 0.32s ease-in-out 0.1s infinite; }
+.project-card:hover .thumb-jellie .runner-1,
+.project-card.card-active .thumb-jellie .runner-1{ animation: runner1-x 5s linear infinite; }
+.project-card:hover .thumb-jellie .runner-1 .cat,
+.project-card.card-active .thumb-jellie .runner-1 .cat{ animation: runner1-y 5s ease-in-out infinite, cat-bob 0.28s ease-in-out infinite; }
+.project-card:hover .thumb-jellie .runner-2,
+.project-card.card-active .thumb-jellie .runner-2{ animation: runner2-x 5s linear infinite; }
+.project-card:hover .thumb-jellie .runner-2 .cat,
+.project-card.card-active .thumb-jellie .runner-2 .cat{ animation: cat-bob 0.32s ease-in-out 0.1s infinite; }
 
 /* Budgeteer — voice transcript types in, then amount pops up */
 .thumb-budgeteer {
@@ -596,8 +618,10 @@ nav a.active {
   width: 0;
   transition: width 1.4s steps(34, end) 0.2s;
 }
-.project-card:hover .thumb-budgeteer .bg-amount { opacity: 1; transform: translateY(0) scale(1); }
-.project-card:hover .thumb-budgeteer .bg-transcript { width: 100%; }
+.project-card:hover .thumb-budgeteer .bg-amount,
+.project-card.card-active .thumb-budgeteer .bg-amount{ opacity: 1; transform: translateY(0) scale(1); }
+.project-card:hover .thumb-budgeteer .bg-transcript,
+.project-card.card-active .thumb-budgeteer .bg-transcript{ width: 100%; }
 .thumb-budgeteer .eq {
   display: flex;
   gap: 5px;
@@ -619,13 +643,20 @@ nav a.active {
 .thumb-budgeteer .eq-bar:nth-child(7) { height: 22%; }
 .thumb-budgeteer .eq-bar { transform-origin: bottom; }
 @keyframes eq-pulse { 0%, 100% { transform: scaleY(0.55); } 50% { transform: scaleY(1); } }
-.project-card:hover .thumb-budgeteer .eq-bar { animation: eq-pulse 0.7s ease-in-out infinite; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(2) { animation-delay: 0.08s; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(3) { animation-delay: 0.16s; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(4) { animation-delay: 0.24s; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(5) { animation-delay: 0.32s; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(6) { animation-delay: 0.40s; }
-.project-card:hover .thumb-budgeteer .eq-bar:nth-child(7) { animation-delay: 0.48s; }
+.project-card:hover .thumb-budgeteer .eq-bar,
+.project-card.card-active .thumb-budgeteer .eq-bar{ animation: eq-pulse 0.7s ease-in-out infinite; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(2),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(2){ animation-delay: 0.08s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(3),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(3){ animation-delay: 0.16s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(4),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(4){ animation-delay: 0.24s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(5),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(5){ animation-delay: 0.32s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(6),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(6){ animation-delay: 0.40s; }
+.project-card:hover .thumb-budgeteer .eq-bar:nth-child(7),
+.project-card.card-active .thumb-budgeteer .eq-bar:nth-child(7){ animation-delay: 0.48s; }
 
 /* Cat Play — ball runs from cursor (JS) + watching cat eye */
 .thumb-catplay {
@@ -722,10 +753,14 @@ nav a.active {
 .thumb-resurfacer .link-card:nth-child(2) { transform: translate(-5px, -5px) rotate(-2deg); opacity: 0.65; }
 .thumb-resurfacer .link-card:nth-child(3) { transform: translate(4px, 4px) rotate(2deg); opacity: 0.85; }
 .thumb-resurfacer .link-card:nth-child(4) { transform: translate(13px, 13px) rotate(5deg); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(4) { transform: translate(13px, -34px) rotate(5deg); border-color: var(--accent); box-shadow: 0 8px 22px rgba(0,0,0,0.6); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(3) { transform: translate(4px, -4px) rotate(2deg); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(2) { transform: translate(-5px, 5px) rotate(-2deg); opacity: 0.75; }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(1) { transform: translate(-14px, 14px) rotate(-5deg); opacity: 0.6; }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(4),
+.project-card.card-active .thumb-resurfacer .link-card:nth-child(4){ transform: translate(13px, -34px) rotate(5deg); border-color: var(--accent); box-shadow: 0 8px 22px rgba(0,0,0,0.6); }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(3),
+.project-card.card-active .thumb-resurfacer .link-card:nth-child(3){ transform: translate(4px, -4px) rotate(2deg); }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(2),
+.project-card.card-active .thumb-resurfacer .link-card:nth-child(2){ transform: translate(-5px, 5px) rotate(-2deg); opacity: 0.75; }
+.project-card:hover .thumb-resurfacer .link-card:nth-child(1),
+.project-card.card-active .thumb-resurfacer .link-card:nth-child(1){ transform: translate(-14px, 14px) rotate(-5deg); opacity: 0.6; }
 
 /* Desk Quotes — portrait + quote, three slides crossfade in app style */
 .thumb-deskquotes {
@@ -799,9 +834,12 @@ nav a.active {
 @keyframes dq-fade-1 { 0%, 30% { opacity: 1; } 33%, 100% { opacity: 0; } }
 @keyframes dq-fade-2 { 0%, 30% { opacity: 0; } 33%, 63% { opacity: 1; } 66%, 100% { opacity: 0; } }
 @keyframes dq-fade-3 { 0%, 63% { opacity: 0; } 66%, 96% { opacity: 1; } 100% { opacity: 0; } }
-.project-card:hover .thumb-deskquotes .dq-s1 { animation: dq-fade-1 6s ease-in-out infinite; }
-.project-card:hover .thumb-deskquotes .dq-s2 { animation: dq-fade-2 6s ease-in-out infinite; }
-.project-card:hover .thumb-deskquotes .dq-s3 { animation: dq-fade-3 6s ease-in-out infinite; }
+.project-card:hover .thumb-deskquotes .dq-s1,
+.project-card.card-active .thumb-deskquotes .dq-s1{ animation: dq-fade-1 6s ease-in-out infinite; }
+.project-card:hover .thumb-deskquotes .dq-s2,
+.project-card.card-active .thumb-deskquotes .dq-s2{ animation: dq-fade-2 6s ease-in-out infinite; }
+.project-card:hover .thumb-deskquotes .dq-s3,
+.project-card.card-active .thumb-deskquotes .dq-s3{ animation: dq-fade-3 6s ease-in-out infinite; }
 
 /* Riddle Game Scoreboard — leaderboard with cycling scores (JS-driven) */
 .thumb-riddle {
@@ -833,7 +871,8 @@ nav a.active {
   font-variant-numeric: tabular-nums;
   transition: transform 0.18s ease;
 }
-.project-card:hover .thumb-riddle .board-num {
+.project-card:hover .thumb-riddle .board-num,
+.project-card.card-active .thumb-riddle .board-num{
   animation: pulse-num 0.4s ease-out;
 }
 @keyframes pulse-num {
@@ -922,18 +961,27 @@ nav a.active {
   opacity: 0;
   transition: opacity 0.3s ease 0.2s;
 }
-.project-card:hover .thumb-brickbreaker .bb-score { opacity: 1; }
+.project-card:hover .thumb-brickbreaker .bb-score,
+.project-card.card-active .thumb-brickbreaker .bb-score{ opacity: 1; }
 
 /* Reduced motion: stop card animations and hold final state */
 @media (prefers-reduced-motion: reduce) {
   .project-card:hover .thumb-jellie .cat-jellie,
+.project-card.card-active .thumb-jellie .cat-jellie,
   .project-card:hover .thumb-jellie .cat-tuna,
+.project-card.card-active .thumb-jellie .cat-tuna,
   .project-card:hover .thumb-jellie .qblock,
+.project-card.card-active .thumb-jellie .qblock,
   .project-card:hover .thumb-budgeteer .eq-bar,
+.project-card.card-active .thumb-budgeteer .eq-bar,
   .project-card:hover .thumb-deskquotes .dq-s1,
+.project-card.card-active .thumb-deskquotes .dq-s1,
   .project-card:hover .thumb-deskquotes .dq-s2,
+.project-card.card-active .thumb-deskquotes .dq-s2,
   .project-card:hover .thumb-deskquotes .dq-s3,
-  .project-card:hover .thumb-riddle .board-num {
+.project-card.card-active .thumb-deskquotes .dq-s3,
+  .project-card:hover .thumb-riddle .board-num,
+.project-card.card-active .thumb-riddle .board-num{
     animation: none;
   }
   .thumb-couchword .cw-tile::after { opacity: 1; transform: scale(1); }
