@@ -1149,6 +1149,21 @@ nav a.active {
   display: block;
 }
 
+/* Live-hero: a project-card used as the detail-page hero (no info panel,
+   no hover lift, retains the framed-card look + animated thumb).
+   Capped width so the inner animations stay proportional — they're
+   calibrated for grid-tile size, not full-width pages. */
+.project-detail .project-card.live-hero {
+  max-width: 540px;
+  margin: 0 auto 40px;
+  cursor: default;
+}
+.project-detail .project-card.live-hero:hover,
+.project-detail .project-card.live-hero.card-active {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+
 .project-detail {
   padding-bottom: 80px;
 }

@@ -32,9 +32,13 @@
     <div class="container">
       <a href="/" class="back-link">&larr; All Projects</a>
 
-      <div class="project-hero">
-        <div class="hero-img">
-          <img src="/images/ai-usage-meter-hero.png" alt="AI Usage Meter screenshot" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'placeholder-icon\'>&#x1F4CA;</span>'">
+      <div class="project-card live-hero">
+        <div class="thumb thumb-ai-meter" aria-hidden="true">
+          <div class="meter">
+            <div class="meter-row" style="--w:72%" data-tgt="72"><span class="meter-label">Claude</span><span class="meter-track"><span class="meter-fill"></span></span><span class="meter-pct">0%</span></div>
+            <div class="meter-row" style="--w:54%" data-tgt="54"><span class="meter-label">GPT</span><span class="meter-track"><span class="meter-fill"></span></span><span class="meter-pct">0%</span></div>
+            <div class="meter-row" style="--w:31%" data-tgt="31"><span class="meter-label">Gemini</span><span class="meter-track"><span class="meter-fill"></span></span><span class="meter-pct">0%</span></div>
+          </div>
         </div>
       </div>
 
@@ -59,6 +63,8 @@
       </nav>
     </div>
   </footer>
+
+  <script src="/card-effects.js" defer></script>
 
 </body>
 </html>

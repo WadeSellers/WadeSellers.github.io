@@ -32,9 +32,18 @@
     <div class="container">
       <a href="/" class="back-link">&larr; All Projects</a>
 
-      <div class="project-hero">
-        <div class="hero-img">
-          <img src="/images/riddle-game-scoreboard-hero.png" alt="Riddle Game Scoreboard screenshot" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'placeholder-icon\'>&#x1F3C6;</span>'">
+      <div class="project-card live-hero">
+        <div class="thumb thumb-riddle" aria-hidden="true">
+          <div class="board">
+            <span class="board-label">TODAY'S BEST</span>
+            <span class="board-num">42</span>
+            <div class="board-rows">
+              <span class="board-row"><span class="rank">1</span><span class="name">WADE</span><span class="pts">42</span></span>
+              <span class="board-row"><span class="rank">2</span><span class="name">JEN</span><span class="pts">38</span></span>
+              <span class="board-row"><span class="rank">3</span><span class="name">SAM</span><span class="pts">29</span></span>
+              <span class="board-row"><span class="rank">4</span><span class="name">RAY</span><span class="pts">21</span></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -61,6 +70,8 @@
       </nav>
     </div>
   </footer>
+
+  <script src="/card-effects.js" defer></script>
 
 </body>
 </html>
