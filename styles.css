@@ -274,7 +274,7 @@ nav a.active {
 /* ---- Live Card Thumbnails ---- */
 
 /* CouchWord — 5x4 grid, COUCH horizontal + WORD vertical sharing the O */
-.thumb-couchword {
+.project-card .thumb-couchword {
   background: #1d1a18;
   position: relative;
 }
@@ -477,7 +477,7 @@ nav a.active {
 .project-card.card-active .thumb-jellie .jt-f4{ animation-delay: -0.08s; }
 
 /* Budgeteer — voice transcript types in, then amount pops up */
-.thumb-budgeteer {
+.project-card .thumb-budgeteer {
   background: #1d1a18;
 }
 .thumb-budgeteer .bg-stack {
@@ -551,7 +551,7 @@ nav a.active {
 .project-card.card-active .thumb-budgeteer .eq-bar:nth-child(7){ animation-delay: 0.48s; }
 
 /* Cat Play — ball runs from cursor (JS) + watching cat eye */
-.thumb-catplay {
+.project-card .thumb-catplay {
   background: linear-gradient(180deg, #1f1d1c 0%, #2a2624 100%);
   position: relative;
   overflow: hidden;
@@ -653,7 +653,7 @@ nav a.active {
 }
 
 /* Resurfacer — link cards with content */
-.thumb-resurfacer {
+.project-card .thumb-resurfacer {
   background: #1d1a18;
   perspective: 700px;
   padding: 20px;
@@ -703,7 +703,7 @@ nav a.active {
 .project-card.card-active .thumb-resurfacer .link-card:nth-child(1){ transform: translate(-14px, 14px) rotate(-5deg); opacity: 0.6; }
 
 /* Desk Quotes — portrait + quote, three slides crossfade in app style */
-.thumb-deskquotes {
+.project-card .thumb-deskquotes {
   background: #faf7f0;
   font-family: Georgia, ui-serif, serif;
   position: relative;
@@ -782,7 +782,7 @@ nav a.active {
 .project-card.card-active .thumb-deskquotes .dq-s3{ animation: dq-fade-3 6s ease-in-out infinite; }
 
 /* Riddle Game Scoreboard — leaderboard with cycling scores (JS-driven) */
-.thumb-riddle {
+.project-card .thumb-riddle {
   background: #15120f;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   padding: 14px 22px 12px;
@@ -842,7 +842,7 @@ nav a.active {
 .thumb-riddle .board-row.leader .pts { color: var(--accent); }
 
 /* Brickbreaker — JS-driven mini game with crossfade reset */
-.thumb-brickbreaker {
+.project-card .thumb-brickbreaker {
   background: #1d1a18;
   position: relative;
   flex-direction: column;
