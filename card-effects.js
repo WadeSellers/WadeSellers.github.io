@@ -353,6 +353,10 @@
       active = false;
       cancelAnimationFrame(raf);
       thumb.style.opacity = '';
+      ball.style.left = '';
+      ball.style.top = '';
+      paddle.style.left = '';
+      if (score) score.textContent = '';
       bricks.forEach((b) => {
         b.style.opacity = '';
         b.style.transform = '';
