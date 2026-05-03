@@ -32,9 +32,29 @@
     <div class="container">
       <a href="/" class="back-link">&larr; All Projects</a>
 
-      <div class="project-hero">
-        <div class="hero-img">
-          <img src="/images/desk-quotes-hero.png" alt="Desk Quotes screenshot" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'placeholder-icon\'>&#x1F4AC;</span>'">
+      <div class="project-card live-hero">
+        <div class="thumb thumb-deskquotes" aria-hidden="true">
+          <div class="dq-slide dq-s1">
+            <p class="dq-line">Imagination is more important than knowledge.</p>
+            <div class="dq-byline">
+              <span class="dq-portrait"></span>
+              <span class="dq-attr">Albert Einstein</span>
+            </div>
+          </div>
+          <div class="dq-slide dq-s2">
+            <p class="dq-line">The only true wisdom is in knowing you know nothing.</p>
+            <div class="dq-byline">
+              <span class="dq-portrait"></span>
+              <span class="dq-attr">Socrates</span>
+            </div>
+          </div>
+          <div class="dq-slide dq-s3">
+            <p class="dq-line">We can only see a short distance ahead.</p>
+            <div class="dq-byline">
+              <span class="dq-portrait"></span>
+              <span class="dq-attr">Alan Turing</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -61,6 +81,8 @@
       </nav>
     </div>
   </footer>
+
+  <script src="/card-effects.js" defer></script>
 
 </body>
 </html>
