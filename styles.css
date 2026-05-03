@@ -652,55 +652,168 @@ nav a.active {
   border-color: #d06070 transparent transparent transparent;
 }
 
-/* Resurfacer — link cards with content */
+/* Resurfacer — pile of saved links; one rises ("resurfaces") at a time */
 .project-card .thumb-resurfacer {
-  background: #1d1a18;
-  perspective: 700px;
-  padding: 20px;
-}
-.thumb-resurfacer .link-stack {
+  background: radial-gradient(120% 80% at 50% 110%, #2a201c 0%, #1d1a18 60%, #14110f 100%);
   position: relative;
-  width: 75%;
-  height: 70%;
+  padding: 18px 16px 22px;
+  overflow: hidden;
 }
-.thumb-resurfacer .link-card {
+.thumb-resurfacer .rs-pile {
+  position: relative;
+  width: 86%;
+  height: 78%;
+  margin: auto;
+}
+.thumb-resurfacer .rs-card {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #2e2624 0%, #3a2e2a 100%);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #2e2724 0%, #261f1c 100%);
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: transform 0.5s cubic-bezier(.2,.8,.2,1), opacity 0.5s ease;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.55);
+  padding: 7px 9px 8px 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 1px;
+  align-items: center;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
 }
-.thumb-resurfacer .link-fav {
-  width: 8px;
-  height: 8px;
+.thumb-resurfacer .rs-fav {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
   border-radius: 2px;
-  background: var(--accent);
-  margin-bottom: 2px;
+  background: var(--rs-c, #999);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+  transform: translateY(-50%);
 }
-.thumb-resurfacer .link-bar {
-  height: 5px;
-  background: color-mix(in srgb, var(--text-muted) 40%, transparent);
-  border-radius: 2px;
+.thumb-resurfacer .rs-title {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  font-size: 0.72rem;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #ece6df;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.thumb-resurfacer .link-bar.short { width: 60%; }
-.thumb-resurfacer .link-card:nth-child(1) { transform: translate(-14px, -14px) rotate(-5deg); opacity: 0.45; }
-.thumb-resurfacer .link-card:nth-child(2) { transform: translate(-5px, -5px) rotate(-2deg); opacity: 0.65; }
-.thumb-resurfacer .link-card:nth-child(3) { transform: translate(4px, 4px) rotate(2deg); opacity: 0.85; }
-.thumb-resurfacer .link-card:nth-child(4) { transform: translate(13px, 13px) rotate(5deg); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(4),
-.project-card.card-active .thumb-resurfacer .link-card:nth-child(4){ transform: translate(13px, -34px) rotate(5deg); border-color: var(--accent); box-shadow: 0 8px 22px rgba(0,0,0,0.6); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(3),
-.project-card.card-active .thumb-resurfacer .link-card:nth-child(3){ transform: translate(4px, -4px) rotate(2deg); }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(2),
-.project-card.card-active .thumb-resurfacer .link-card:nth-child(2){ transform: translate(-5px, 5px) rotate(-2deg); opacity: 0.75; }
-.project-card:hover .thumb-resurfacer .link-card:nth-child(1),
-.project-card.card-active .thumb-resurfacer .link-card:nth-child(1){ transform: translate(-14px, 14px) rotate(-5deg); opacity: 0.6; }
+.thumb-resurfacer .rs-why {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  font-size: 0.6rem;
+  line-height: 1.1;
+  color: color-mix(in srgb, var(--text-muted) 85%, transparent);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thumb-resurfacer .rs-c-pink   { --rs-c: #e07a8f; }
+.thumb-resurfacer .rs-c-blue   { --rs-c: #6aa3d6; }
+.thumb-resurfacer .rs-c-orange { --rs-c: #d68b5a; }
+.thumb-resurfacer .rs-c-green  { --rs-c: #7fb088; }
+.thumb-resurfacer .rs-c-yellow { --rs-c: #d6c25a; }
+.thumb-resurfacer .rs-c-purple { --rs-c: #a888d6; }
+
+/* Pile resting positions — bottom-up stack with gentle fan.
+   Each card stores its rest transform in --rs-rest so the keyframe can return to it. */
+.thumb-resurfacer .rs-card { transform: var(--rs-rest); }
+.thumb-resurfacer .rs-card:nth-child(1) { --rs-rest: translate(0, 0)      rotate(0deg);    z-index: 6; }
+.thumb-resurfacer .rs-card:nth-child(2) { --rs-rest: translate(-3px, -7px)  rotate(-1.2deg); z-index: 5; }
+.thumb-resurfacer .rs-card:nth-child(3) { --rs-rest: translate(4px, -14px)  rotate(1.4deg);  z-index: 4; }
+.thumb-resurfacer .rs-card:nth-child(4) { --rs-rest: translate(-5px, -21px) rotate(-1.6deg); z-index: 3; }
+.thumb-resurfacer .rs-card:nth-child(5) { --rs-rest: translate(3px, -28px)  rotate(1deg);    z-index: 2; }
+.thumb-resurfacer .rs-card:nth-child(6) { --rs-rest: translate(-2px, -35px) rotate(-0.8deg); z-index: 1; }
+/* Depth fade on the back of the pile via overlay */
+.thumb-resurfacer .rs-card:nth-child(2)::before,
+.thumb-resurfacer .rs-card:nth-child(3)::before,
+.thumb-resurfacer .rs-card:nth-child(4)::before,
+.thumb-resurfacer .rs-card:nth-child(5)::before,
+.thumb-resurfacer .rs-card:nth-child(6)::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: rgba(20,17,15,0.18);
+  pointer-events: none;
+}
+.thumb-resurfacer .rs-card:nth-child(3)::before { background: rgba(20,17,15,0.34); }
+.thumb-resurfacer .rs-card:nth-child(4)::before { background: rgba(20,17,15,0.48); }
+.thumb-resurfacer .rs-card:nth-child(5)::before { background: rgba(20,17,15,0.60); }
+.thumb-resurfacer .rs-card:nth-child(6)::before { background: rgba(20,17,15,0.70); }
+
+/* "now" pill — sits in corner, pulses while a card is up */
+.thumb-resurfacer .rs-now {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  padding: 3px 7px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Animate when card is active (hover or scroll-into-view autoplay) */
+.project-card:hover .thumb-resurfacer .rs-card,
+.project-card.card-active .thumb-resurfacer .rs-card {
+  animation: rs-resurface 9s cubic-bezier(.4,.05,.3,1) infinite;
+}
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(1),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(1) { animation-delay: 0s; }
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(2),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(2) { animation-delay: -1.5s; }
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(3),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(3) { animation-delay: -3s; }
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(4),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(4) { animation-delay: -4.5s; }
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(5),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(5) { animation-delay: -6s; }
+.project-card:hover .thumb-resurfacer .rs-card:nth-child(6),
+.project-card.card-active .thumb-resurfacer .rs-card:nth-child(6) { animation-delay: -7.5s; }
+
+.project-card:hover .thumb-resurfacer .rs-now,
+.project-card.card-active .thumb-resurfacer .rs-now {
+  animation: rs-now-pulse 1.5s ease-in-out infinite;
+}
+
+/* Each card's own cycle: rest → rise + glow → hold → drop back into pile */
+@keyframes rs-resurface {
+  0%   { transform: var(--rs-rest); z-index: auto; box-shadow: 0 4px 14px rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.06); }
+  4%   { transform: translate(0, -68px) rotate(0deg) scale(1.06); z-index: 30;
+         box-shadow: 0 14px 30px rgba(0,0,0,0.7), 0 0 0 1px var(--rs-c), 0 0 22px color-mix(in srgb, var(--rs-c) 45%, transparent);
+         border-color: color-mix(in srgb, var(--rs-c) 70%, transparent); }
+  18%  { transform: translate(0, -68px) rotate(0deg) scale(1.06); z-index: 30;
+         box-shadow: 0 14px 30px rgba(0,0,0,0.7), 0 0 0 1px var(--rs-c), 0 0 22px color-mix(in srgb, var(--rs-c) 45%, transparent);
+         border-color: color-mix(in srgb, var(--rs-c) 70%, transparent); }
+  23%  { transform: var(--rs-rest); z-index: 30;
+         box-shadow: 0 4px 14px rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.06); }
+  24%, 100% { transform: var(--rs-rest); z-index: auto;
+         box-shadow: 0 4px 14px rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.06); }
+}
+/* Pill pulses once per card surfacing — aligned to the 1.5s stagger */
+@keyframes rs-now-pulse {
+  0%, 24%   { opacity: 0; transform: translateY(-3px); }
+  35%, 88%  { opacity: 1; transform: translateY(0); }
+  100%      { opacity: 0; transform: translateY(-3px); }
+}
 
 /* Desk Quotes — editorial pull-quote: decorative open-quote, italic text, byline below */
 .project-card .thumb-deskquotes {
