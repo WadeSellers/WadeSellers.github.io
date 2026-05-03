@@ -364,9 +364,8 @@
     });
   }
 
-  // ---- Mobile: fire card animations as cards scroll into view ----
-  function setupMobileAutoplay() {
-    if (!window.matchMedia('(hover: none)').matches) return;
+  // ---- Auto-play card animations as they scroll into view (desktop + mobile) ----
+  function setupAutoplay() {
     if (!('IntersectionObserver' in window)) return;
     const cards = document.querySelectorAll('.project-card');
     const io = new IntersectionObserver((entries) => {
@@ -389,7 +388,7 @@
     setupMeter();
     setupRiddle();
     setupBrickbreaker();
-    setupMobileAutoplay();
+    setupAutoplay();
   }
 
   if (document.readyState === 'loading') {
