@@ -1,0 +1,142 @@
+/* ---- Thumb art: reel-harvest + Names & Faces + ai.html bits ---- */
+
+/* reel-harvest: a phone chat that ends in a PDF */
+.project-card .thumb.thumb-harvest {
+  background: linear-gradient(160deg, #1c2733 0%, #10161d 100%);
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 16px;
+  align-items: stretch;
+  justify-content: center;
+}
+.rh-bubble {
+  max-width: 78%;
+  padding: 6px 11px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #e8eef4;
+}
+.rh-sent {
+  align-self: flex-end;
+  background: #3a6ea5;
+  border-bottom-right-radius: 4px;
+}
+.rh-bot {
+  align-self: flex-start;
+  background: #26313c;
+  border-bottom-left-radius: 4px;
+}
+.rh-doc {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #26313c;
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  padding: 8px 12px;
+}
+.rh-doc-icon {
+  width: 26px;
+  height: 32px;
+  border-radius: 4px;
+  background: #e0865a;
+  color: #10161d;
+  font-size: 0.55rem;
+  font-weight: 700;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 3px;
+}
+.rh-doc-name {
+  color: #e8eef4;
+  font-size: 0.72rem;
+}
+.rh-doc-name small {
+  display: block;
+  color: #8fa3b5;
+  font-size: 0.62rem;
+}
+
+/* Names & Faces: a flashcard mid-reveal */
+.project-card .thumb.thumb-naf {
+  background: linear-gradient(160deg, #f3ede4 0%, #e5dccd 100%);
+  position: relative;
+}
+@media (prefers-color-scheme: dark) {
+  .project-card .thumb.thumb-naf { background: linear-gradient(160deg, #2e2a26 0%, #262220 100%); }
+}
+.naf-card {
+  position: absolute;
+  width: 44%;
+  aspect-ratio: 3 / 4;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.naf-back-1 { transform: rotate(-7deg) translate(-58%, -4%); left: 50%; top: 12%; opacity: 0.55; }
+.naf-back-2 { transform: rotate(6deg) translate(-42%, -2%); left: 50%; top: 10%; opacity: 0.75; }
+.naf-front  { transform: translate(-50%, 0); left: 50%; top: 8%; }
+.naf-face {
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e0a87c, #b5754a);
+}
+.naf-face-2 { background: radial-gradient(circle at 35% 30%, #c9a06b, #8a6a45); }
+.naf-face-3 { background: radial-gradient(circle at 35% 30%, #d98f6e, #9c5c3e); }
+.naf-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 6px;
+  padding: 2px 10px;
+}
+.naf-tick { color: var(--accent); font-weight: 700; }
+
+/* ai.html: video slot + wiki card */
+.video-slot {
+  aspect-ratio: 16 / 9;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-muted);
+  margin: 0 0 3.5rem;
+}
+.video-slot .play {
+  font-size: 2.2rem;
+  color: var(--accent);
+}
+.project-card .thumb.thumb-wiki {
+  background: linear-gradient(160deg, #23282e 0%, #171a1e 100%);
+  position: relative;
+}
+.wk-node {
+  position: absolute;
+  background: #2e3640;
+  color: #cdd6df;
+  font-size: 0.62rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid #3c4650;
+}
+.wk-link {
+  position: absolute;
+  height: 1px;
+  background: #3c4650;
+  transform-origin: 0 0;
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>reel-harvest - Wade Sellers</title>
+  <meta name="description" content="Share an Instagram Reel from your phone; a Mac Mini transcribes it locally and Claude rebuilds its proven format as a post script in your voice, delivered back as a PDF.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <meta property="og:title" content="reel-harvest - Wade Sellers">
+  <meta property="og:description" content="Share an Instagram Reel from your phone; a Mac Mini transcribes it locally and Claude rebuilds its proven format as a post script in your voice, delivered back as a PDF.">
+  <meta property="og:image" content="https://wadesellers.com/images/og.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://wadesellers.com/projects/reel-harvest.html">
+  <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/ai-thumbs.css?v=2">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <a href="/" class="site-name">Wade Sellers</a>
+      <nav>
+        <a href="/">Projects</a>
+        <a href="/now.html">Now</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="project-detail">
+    <div class="container">
+      <a href="/ai.html" class="back-link">&larr; Built with AI</a>
+
+      <div class="project-card live-hero">
+        <div class="thumb thumb-harvest" aria-hidden="true">
+          <span class="rh-bubble rh-sent">instagram.com/reel/DZiu6K&hellip;</span>
+          <span class="rh-bubble rh-bot">&#x2705; Harvested: &ldquo;you don't find yourself, you build yourself&hellip;&rdquo; &#x270D;&#xFE0F; Drafting your post pack&hellip;</span>
+          <span class="rh-doc">
+            <span class="rh-doc-icon">PDF</span>
+            <span class="rh-doc-name">post-pack.pdf<small>hook &middot; script &middot; caption</small></span>
+          </span>
+        </div>
+      </div>
+
+      <h1>reel-harvest</h1>
+      <div class="meta">
+        <span class="tag">AI Pipeline</span>
+        <span class="tag">Python</span>
+        <span class="tag">Whisper</span>
+        <span class="tag">Claude</span>
+      </div>
+
+      <div class="description">
+        <p>Share an Instagram Reel from my phone. Ninety seconds later my phone buzzes with a designed PDF: that Reel's proven format, torn down beat by beat and rebuilt as a post script in my own voice, ready to film. Nobody touches a computer.</p>
+        <p>Under the hood: a Telegram bot hands the link to a daemon on a Mac Mini, which downloads the video, transcribes the spoken words locally with Whisper, deletes the video, and passes the transcript to a headless Claude session. Claude mines the source's beat structure &mdash; hook, open loop, payload, button &mdash; then rebuilds it out of my material and writes four coordinated artifacts: a grid cover, a two-second hook, a beat-table script, and an algorithm-first caption. Styled HTML becomes a PDF, and the PDF lands back in the same chat.</p>
+        <p>The two design constraints that shaped everything: <strong>$0 marginal cost</strong> (local transcription, no metered APIs) and <strong>zero babysitting</strong> (one share-sheet tap, self-healing daemons, errors retry themselves). It has run unattended since June 2026.</p>
+        <p><a href="https://github.com/WadeSellers/reel-harvest" target="_blank" rel="noopener">View on GitHub &rarr;</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <span>&copy; 2026 Wade Sellers</span>
+      <nav>
+        <a href="mailto:wade@wadesellers.com">wade@wadesellers.com</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/card-effects.js" defer></script>
+
+</body>
+</html>

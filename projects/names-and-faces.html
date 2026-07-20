@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Names &amp; Faces - Wade Sellers</title>
+  <meta name="description" content="Import a PDF of headshots; on-device Vision finds every face, reads every name, and deals a self-pacing flashcard deck. Meet 23 strangers Monday, greet them by name Friday.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <meta property="og:title" content="Names &amp; Faces - Wade Sellers">
+  <meta property="og:description" content="Import a PDF of headshots; on-device Vision finds every face, reads every name, and deals a self-pacing flashcard deck.">
+  <meta property="og:image" content="https://wadesellers.com/images/og.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://wadesellers.com/projects/names-and-faces.html">
+  <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/ai-thumbs.css?v=2">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <a href="/" class="site-name">Wade Sellers</a>
+      <nav>
+        <a href="/">Projects</a>
+        <a href="/now.html">Now</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="project-detail">
+    <div class="container">
+      <a href="/ai.html" class="back-link">&larr; Built with AI</a>
+
+      <div class="project-card live-hero">
+        <div class="thumb thumb-naf" aria-hidden="true">
+          <span class="naf-card naf-back-1"><span class="naf-face naf-face-2"></span></span>
+          <span class="naf-card naf-back-2"><span class="naf-face naf-face-3"></span></span>
+          <span class="naf-card naf-front">
+            <span class="naf-face"></span>
+            <span class="naf-name">Coraline <span class="naf-tick">&#x2713;</span></span>
+          </span>
+        </div>
+      </div>
+
+      <h1>Names &amp; Faces</h1>
+      <div class="meta">
+        <span class="tag">iOS</span>
+        <span class="tag">SwiftUI</span>
+        <span class="tag">Vision</span>
+        <span class="tag">On-device AI</span>
+      </div>
+
+      <div class="description">
+        <p>Meet 23 strangers on Monday. Greet every one of them by name on Friday. I work at a theater conservatory, and a few times a year a new cohort arrives as a PDF of headshots with names printed underneath &mdash; wonderful people, total strangers. There is nothing warmer than someone who's met you exactly once saying &ldquo;Morning, Coraline&rdquo; like it was nothing.</p>
+        <p>You import the PDF. That's the whole workflow. On-device, in seconds, the app renders every page, finds every face, reads the name printed under it, and deals a deck of flashcards. When one headshot defeated Apple's face detector, the app noticed an unclaimed name sitting on the page, figured the photo had to be right above it, and went and got it anyway.</p>
+        <p>The deck paces itself: you start with three faces, add more when you're feeling dangerous, and the cards quietly show you the people you blank on more often than the ones you know. Everything runs on the phone &mdash; no servers, no accounts, the students' photos never leave the device. Built in two days, in conversation with Claude.</p>
+        <p><a href="https://github.com/WadeSellers/names-and-faces" target="_blank" rel="noopener">View on GitHub &rarr;</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <span>&copy; 2026 Wade Sellers</span>
+      <nav>
+        <a href="mailto:wade@wadesellers.com">wade@wadesellers.com</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/card-effects.js" defer></script>
+
+</body>
+</html>
