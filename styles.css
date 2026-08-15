@@ -1120,6 +1120,17 @@ nav a.active {
   .thumb-budgeteer .bg-transcript { width: 100%; transition: none; }
 }
 
+/* Real app screenshot inside a project description */
+.project-detail .app-shot {
+  display: block;
+  width: min(300px, 80%);
+  height: auto;
+  margin: 28px auto;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
 /* ---- CTA Section ---- */
 .cta {
   padding: 56px 0;
