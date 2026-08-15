@@ -152,66 +152,6 @@
     });
   }
 
-  // ---- Riddle Scoreboard: scores cycle, leader reflected in big num ----
-  function setupRiddle() {
-    const thumb = document.querySelector('.thumb-riddle');
-    if (!thumb) return;
-    const card = thumb.closest('.project-card');
-    const big = thumb.querySelector('.board-num');
-    const rows = thumb.querySelectorAll('.board-row');
-    if (!big || rows.length === 0) return;
-
-    const players = Array.from(rows).map((row) => ({
-      row,
-      name: row.querySelector('.name'),
-      pts: row.querySelector('.pts'),
-      rank: row.querySelector('.rank'),
-      score: parseInt(row.querySelector('.pts').textContent, 10) || 0,
-      target: parseInt(row.querySelector('.pts').textContent, 10) || 0,
-    }));
-
-    function render() {
-      const sorted = [...players].sort((a, b) => b.score - a.score);
-      sorted.forEach((p, i) => {
-        p.row.style.order = i;
-        p.rank.textContent = i + 1;
-        p.pts.textContent = Math.round(p.score);
-        p.row.classList.toggle('leader', i === 0);
-      });
-      big.textContent = Math.round(sorted[0].score);
-    }
-    render();
-
-    let active = false;
-    let raf;
-
-    function tick() {
-      players.forEach((p) => {
-        if (Math.random() < 0.06) {
-          const delta = Math.floor(Math.random() * 12) - 4;
-          p.target = Math.max(5, Math.min(99, p.target + delta));
-        }
-        p.score += (p.target - p.score) * 0.08;
-      });
-      render();
-      if (active) raf = requestAnimationFrame(tick);
-    }
-
-    card.addEventListener('mouseenter', () => {
-      if (reduce) return;
-      active = true;
-      raf = requestAnimationFrame(tick);
-    });
-    card.addEventListener('mouseleave', () => {
-      active = false;
-      cancelAnimationFrame(raf);
-      players.forEach((p) => {
-        p.score = p.target = parseInt(p.pts.textContent, 10) || p.target;
-      });
-      render();
-    });
-  }
-
   // ---- Brickbreaker thumbnail: 5s game loop with crossfade reset ----
   function setupBrickbreaker() {
     const thumb = document.querySelector('.thumb-brickbreaker');
@@ -364,6 +304,172 @@
     });
   }
 
+  // ---- Burpee Counter: reps land with a jelly bump, clock runs, 10s go gold ----
+  function setupBurpee() {
+    const thumb = document.querySelector('.thumb-burpee');
+    if (!thumb) return;
+    const card = thumb.closest('.project-card');
+    const num = thumb.querySelector('.bp-num');
+    const clock = thumb.querySelector('.bp-clock');
+    const day = thumb.querySelector('.bp-day');
+    if (!card || !num || !clock) return;
+
+    // Live day badge: day 1 = 2026-07-02, same default as the real app
+    if (day) {
+      const dayOne = new Date(2026, 6, 2);
+      const now = new Date();
+      const n = Math.max(1, Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - dayOne) / 86400000) + 1);
+      day.textContent = 'DAY ' + n;
+    }
+
+    if (reduce) {
+      // Static mid-set frame instead of animation
+      num.textContent = '47';
+      clock.textContent = '03:12.44';
+      return;
+    }
+
+    let count = 0;
+    let startAt = 0;
+    let repTimer = 0;
+    let clockRaf = 0;
+
+    function fmt(ms) {
+      const m = Math.floor(ms / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      const h = Math.floor((ms % 1000) / 10);
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + String(h).padStart(2, '0');
+    }
+
+    function tickClock() {
+      clock.textContent = fmt(performance.now() - startAt);
+      clockRaf = requestAnimationFrame(tickClock);
+    }
+
+    function rep() {
+      count += 1;
+      num.textContent = count;
+      num.classList.remove('bp-land');
+      void num.offsetWidth; // restart the jelly animation
+      num.classList.add('bp-land');
+      if (count % 10 === 0) {
+        num.classList.add('bp-gold');
+        setTimeout(() => num.classList.remove('bp-gold'), 600);
+      }
+      repTimer = setTimeout(rep, 320 + Math.random() * 220);
+    }
+
+    card.addEventListener('mouseenter', () => {
+      if (repTimer) return;
+      count = 0;
+      startAt = performance.now();
+      tickClock();
+      repTimer = setTimeout(rep, 250);
+    });
+    card.addEventListener('mouseleave', () => {
+      clearTimeout(repTimer);
+      cancelAnimationFrame(clockRaf);
+      repTimer = 0;
+      count = 0;
+      num.textContent = '0';
+      num.classList.remove('bp-land', 'bp-gold');
+      clock.textContent = '00:00.00';
+    });
+  }
+
+  // ---- Hero photo: professional headshot enters the Matrix on hover/tap ----
+  function setupHeroPhoto() {
+    const wrap = document.getElementById('hero-photo');
+    if (!wrap) return;
+    const img = wrap.querySelector('img');
+    const canvas = wrap.querySelector('.hp-pixel');
+    if (!img || !canvas) return;
+
+    let raf = 0;
+    let drops = null;
+    let base = null; // offscreen pixelated frame
+
+    function buildBase() {
+      const w = wrap.clientWidth;
+      const h = wrap.clientHeight;
+      if (!w || !h || !img.naturalWidth) return false;
+      canvas.width = w;
+      canvas.height = h;
+      // Draw the photo tiny, then blow it up with smoothing off = chunky pixels
+      const cols = 36;
+      const rows = Math.round(cols * (h / w));
+      base = document.createElement('canvas');
+      base.width = w;
+      base.height = h;
+      const tiny = document.createElement('canvas');
+      tiny.width = cols;
+      tiny.height = rows;
+      const tctx = tiny.getContext('2d');
+      // object-fit: cover crop math
+      const scale = Math.max(cols / img.naturalWidth, rows / img.naturalHeight);
+      const sw = cols / scale, sh = rows / scale;
+      const sx = (img.naturalWidth - sw) / 2, sy = (img.naturalHeight - sh) / 2;
+      tctx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
+      const bctx = base.getContext('2d');
+      bctx.imageSmoothingEnabled = false;
+      bctx.drawImage(tiny, 0, 0, w, h);
+      const colW = w / 22;
+      drops = Array.from({ length: 22 }, (_, i) => ({
+        x: i * colW + colW / 2,
+        y: Math.random() * -h,
+        v: 2 + Math.random() * 3.5,
+      }));
+      return true;
+    }
+
+    const GLYPHS = '01アイウエオカキクケコサシスセソタチツテト';
+    function paint() {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.drawImage(base, 0, 0);
+      ctx.fillStyle = 'rgba(0, 12, 4, 0.28)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = '700 13px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      drops.forEach((d) => {
+        for (let t = 0; t < 7; t++) {
+          const y = d.y - t * 15;
+          if (y < -10 || y > h + 10) continue;
+          ctx.fillStyle = t === 0 ? 'rgba(210, 255, 220, 0.95)' : 'rgba(84, 214, 118, ' + (0.75 - t * 0.1) + ')';
+          ctx.fillText(GLYPHS[Math.floor(Math.random() * GLYPHS.length)], d.x, y);
+        }
+        d.y += d.v;
+        if (d.y - 7 * 15 > h) { d.y = Math.random() * -60; d.v = 2 + Math.random() * 3.5; }
+      });
+      raf = requestAnimationFrame(paint);
+    }
+
+    function on() {
+      if (wrap.classList.contains('hp-on')) return;
+      if (!base && !buildBase()) return;
+      wrap.classList.add('hp-on');
+      if (!reduce) raf = requestAnimationFrame(paint);
+      else { const ctx = canvas.getContext('2d'); ctx.drawImage(base, 0, 0); }
+    }
+    function off() {
+      wrap.classList.remove('hp-on');
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+
+    wrap.addEventListener('mouseenter', on);
+    wrap.addEventListener('mouseleave', off);
+    // Touch: tap toggles
+    wrap.addEventListener('click', () => {
+      if (window.matchMedia('(hover: hover)').matches) return;
+      wrap.classList.contains('hp-on') ? off() : on();
+    });
+    window.addEventListener('resize', () => {
+      base = null;
+      if (wrap.classList.contains('hp-on')) { off(); on(); }
+    });
+  }
+
   // ---- Auto-play card animations as they scroll into view (desktop + mobile) ----
   function setupAutoplay() {
     if (!('IntersectionObserver' in window)) return;
@@ -386,8 +492,9 @@
   function init() {
     setupCatPlay();
     setupMeter();
-    setupRiddle();
     setupBrickbreaker();
+    setupBurpee();
+    setupHeroPhoto();
     setupAutoplay();
   }
 
