@@ -907,6 +907,119 @@ nav a.active {
 .project-card:hover .thumb-deskquotes .dq-s3,
 .project-card.card-active .thumb-deskquotes .dq-s3{ animation: dq-fade-3 6s ease-in-out infinite; }
 
+/* Names & Faces — flashcard deck: name slides up, card swipes away, next face waiting */
+.project-card .thumb-namesfaces {
+  background: linear-gradient(160deg, #eef1f5 0%, #dfe4ea 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.thumb-namesfaces .nf-deck {
+  position: relative;
+  width: 104px;
+  height: 132px;
+  margin-top: -8px;
+}
+.thumb-namesfaces .nf-card {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(20, 30, 50, 0.08);
+  box-shadow: 0 4px 14px rgba(20, 30, 50, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+}
+.thumb-namesfaces .nf-c3 { transform: rotate(6deg) translate(7px, 2px); }
+.thumb-namesfaces .nf-c2 { transform: rotate(-5deg) translate(-6px, 1px); }
+.thumb-namesfaces .nf-face {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #e6eaf1;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.thumb-namesfaces .nf-face::before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #97a1b4;
+}
+.thumb-namesfaces .nf-face::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 25px;
+  border-radius: 50% 50% 0 0;
+  background: #97a1b4;
+}
+.thumb-namesfaces .nf-c2 .nf-face::before,
+.thumb-namesfaces .nf-c2 .nf-face::after { background: #a9b3c4; }
+.thumb-namesfaces .nf-c3 .nf-face::before,
+.thumb-namesfaces .nf-c3 .nf-face::after { background: #bcc4d2; }
+.thumb-namesfaces .nf-name {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  color: #1c2333;
+  background: #e2e7ef;
+  border-radius: 5px;
+  padding: 4px 9px;
+  transform: translateY(0);
+}
+.thumb-namesfaces .nf-progress {
+  position: absolute;
+  bottom: 9px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a8496;
+}
+@keyframes nf-swipe {
+  0%, 50%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  58%       { transform: translate(130%, -8px) rotate(14deg); opacity: 0; }
+  58.01%    { transform: translate(0, 6px) scale(0.94); opacity: 0; }
+  66%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+}
+@keyframes nf-reveal {
+  0%, 55%   { transform: translateY(0); opacity: 1; }
+  56%, 82%  { transform: translateY(160%); opacity: 0; }
+  90%, 100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes nf-promote {
+  0%, 54%   { scale: 1; }
+  60%       { scale: 1.06; }
+  66%, 100% { scale: 1; }
+}
+.project-card:hover .thumb-namesfaces .nf-c1,
+.project-card.card-active .thumb-namesfaces .nf-c1 { animation: nf-swipe 5.5s ease-in-out infinite; }
+.project-card:hover .thumb-namesfaces .nf-c1 .nf-name,
+.project-card.card-active .thumb-namesfaces .nf-c1 .nf-name { animation: nf-reveal 5.5s ease-in-out infinite; }
+.project-card:hover .thumb-namesfaces .nf-c2,
+.project-card.card-active .thumb-namesfaces .nf-c2 { animation: nf-promote 5.5s ease-in-out infinite; }
+
 /* Brickbreaker — JS-driven mini game with crossfade reset */
 .project-card .thumb-brickbreaker {
   background: #1d1a18;
@@ -990,7 +1103,13 @@ nav a.active {
   .project-card:hover .thumb-deskquotes .dq-s2,
 .project-card.card-active .thumb-deskquotes .dq-s2,
   .project-card:hover .thumb-deskquotes .dq-s3,
-.project-card.card-active .thumb-deskquotes .dq-s3{
+.project-card.card-active .thumb-deskquotes .dq-s3,
+  .project-card:hover .thumb-namesfaces .nf-c1,
+.project-card.card-active .thumb-namesfaces .nf-c1,
+  .project-card:hover .thumb-namesfaces .nf-c1 .nf-name,
+.project-card.card-active .thumb-namesfaces .nf-c1 .nf-name,
+  .project-card:hover .thumb-namesfaces .nf-c2,
+.project-card.card-active .thumb-namesfaces .nf-c2{
     animation: none;
   }
   .thumb-couchword .cw-tile::after { opacity: 1; transform: scale(1); }
