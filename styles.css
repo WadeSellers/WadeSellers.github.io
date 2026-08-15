@@ -351,6 +351,9 @@ nav a.active {
   width: 48px;
   text-align: right;
 }
+.live-hero .thumb-ai-meter .meter-label {
+  width: 84px;
+}
 .thumb-ai-meter .meter-track {
   flex: 1;
   height: 7px;
