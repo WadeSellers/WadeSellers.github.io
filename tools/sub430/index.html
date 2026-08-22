@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Sub 4:30</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F3F4F0;--card:#FFFFFF;--ink:#1A2130;--ink-2:#4A5366;--mute:#8A92A3;--line:#D9DCE2;--line-2:#C4C9D2;
+  --accent:#EE6A1E;--accent-ink:#FFFFFF;--accent-soft:#FBE6D9;--good:#2E8B57;--good-soft:#DDF1E4;
+  --today:#FFF4EC;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12151B;--card:#1B1F27;--ink:#EEF0F4;--ink-2:#B9BFCC;--mute:#7B8396;--line:#2B303B;--line-2:#3A404D;
+    --accent:#F5782F;--accent-ink:#12151B;--accent-soft:#3A2416;--good:#5FBF84;--good-soft:#1E3328;--today:#26201A;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12151B;--card:#1B1F27;--ink:#EEF0F4;--ink-2:#B9BFCC;--mute:#7B8396;--line:#2B303B;--line-2:#3A404D;
+  --accent:#F5782F;--accent-ink:#12151B;--accent-soft:#3A2416;--good:#5FBF84;--good-soft:#1E3328;--today:#26201A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Barlow,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:28px 20px 80px}
+.cond{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600}
+
+/* bib */
+.bib{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:22px 26px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;position:relative}
+.bib:before,.bib:after{content:"";position:absolute;top:14px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:1.5px solid var(--ink)}
+.bib:before{left:14px}.bib:after{right:14px}
+.bib h1{margin:0;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:clamp(64px,12vw,112px);line-height:.9;letter-spacing:-.01em}
+.bib h1 small{font-size:.32em;font-weight:600;letter-spacing:.04em;color:var(--ink-2);display:block;margin-bottom:6px}
+.bib .meta{text-align:right;display:grid;gap:6px}
+.bib .meta b{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:40px;line-height:1;display:block}
+.bib .meta span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.stat b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:34px;line-height:1.05}
+.stat b i{font-style:normal;font-size:18px;color:var(--mute);font-weight:600;margin-left:3px}
+.stat > span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 4px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .6s ease}
+.barlabel{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+
+/* paces */
+.paces{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
+.pace{border:1px solid var(--line-2);border-radius:6px;padding:6px 12px;display:flex;gap:10px;align-items:baseline;background:var(--card)}
+.pace b{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:700}
+.pace span{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);font-weight:600}
+.pace.mp{border-color:var(--accent);background:var(--accent-soft)}
+
+h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:28px;margin:36px 0 12px;letter-spacing:.01em;display:flex;align-items:baseline;gap:12px}
+h2 small{font-family:Barlow,sans-serif;font-size:13px;font-weight:500;color:var(--mute);letter-spacing:0}
+
+/* weeks */
+.week{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.week.now{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.wh{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.wh:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.wh .wn{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:30px;line-height:1;min-width:44px}
+.wh .wn em{font-style:normal;font-size:12px;letter-spacing:.12em;color:var(--mute);display:block;font-family:Barlow,sans-serif;font-weight:600}
+.wh .wt{font-size:14px;color:var(--ink-2)}
+.wh .wt b{color:var(--ink);font-weight:600}
+.wh .wr{text-align:right;font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.04em}
+.wh .wr b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--ink);font-weight:700;line-height:1}
+.tag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--accent);color:var(--accent-ink);margin-left:8px;vertical-align:middle}
+.tag.q{background:var(--line);color:var(--ink-2)}
+.tag.done{background:var(--good-soft);color:var(--good)}
+.days{display:none}
+.week.open .days{display:block}
+.day{display:grid;grid-template-columns:64px 1fr 74px 74px 86px 30px;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.day:last-child{border-bottom:0}
+.day.today{background:var(--today)}
+.day.off{color:var(--mute)}
+.day .dn{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;line-height:1.1}
+.day .dn em{font-style:normal;display:block;font-family:Barlow,sans-serif;font-size:11px;color:var(--mute);font-weight:600;letter-spacing:.04em}
+.day .plan{font-size:14px}
+.day .plan b{font-weight:600}
+.day .plan .sub{color:var(--mute);font-size:12px;display:block}
+.day input,.day select{width:100%;font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line-2);border-radius:6px;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+.day input:focus,.day select:focus,.note:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.day input::placeholder{color:var(--mute)}
+.day.done .plan b{text-decoration:line-through;text-decoration-color:var(--good);text-decoration-thickness:2px}
+.day .chk{display:flex;justify-content:flex-end}
+.chk input{width:22px;height:22px;accent-color:var(--good);margin:0;cursor:pointer}
+.noterow{padding:0 16px 12px;border-bottom:1px solid var(--line);display:none}
+.day.done + .noterow,.day.has-note + .noterow,.day.today + .noterow{display:block}
+.note{width:100%;font:inherit;font-size:14px;padding:8px 10px;border:1px dashed var(--line-2);border-radius:6px;background:transparent;color:var(--ink);resize:vertical;min-height:36px}
+.wknote{padding:12px 16px;display:grid;gap:6px}
+.wknote label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.hdr{display:grid;grid-template-columns:64px 1fr 74px 74px 86px 30px;gap:10px;padding:6px 16px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600;border-bottom:1px solid var(--line)}
+
+/* race */
+.race{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;overflow:hidden}
+.race table{width:100%;border-collapse:collapse;font-size:15px}
+.race th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600;padding:10px 16px;border-bottom:1px solid var(--line)}
+.race td{padding:10px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.race tr:last-child td{border-bottom:0}
+.race td.p{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:22px;white-space:nowrap}
+.race tr.key td{background:var(--accent-soft)}
+.race .foot{padding:12px 16px;font-size:14px;color:var(--ink-2);border-top:1px solid var(--line);display:grid;gap:4px}
+.result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 16px;border-top:1.5px solid var(--ink)}
+.result input{font:inherit;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:34px;width:150px;padding:4px 10px;border:1px solid var(--line-2);border-radius:6px;background:var(--paper);color:var(--ink);text-align:center}
+.result .verdict{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:26px;color:var(--mute)}
+.result .verdict.yes{color:var(--good)}
+.result .verdict.no{color:var(--accent)}
+
+/* rules */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.rule{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:15px}
+.rule b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:700;margin-bottom:2px}
+
+/* status */
+.status{position:sticky;bottom:14px;margin-top:30px;display:flex;justify-content:center;pointer-events:none}
+.status span{pointer-events:auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ink-2);background:var(--card);border:1px solid var(--line-2);border-radius:999px;padding:6px 14px;opacity:0;transition:opacity .3s}
+.status span.show{opacity:1}
+.status span.warn{color:var(--accent);border-color:var(--accent)}
+.footer{margin-top:28px;font-size:13px;color:var(--mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer button{font:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ink-2);background:none;border:1px solid var(--line-2);border-radius:6px;padding:5px 10px;cursor:pointer}
+.footer button:hover{border-color:var(--ink)}
+.footer button:focus-visible{outline:2px solid var(--accent)}
+@media (max-width:640px){
+  .bib{grid-template-columns:1fr}.bib .meta{text-align:left;grid-auto-flow:column;justify-content:start;gap:24px}
+  .day,.hdr{grid-template-columns:52px 1fr 62px 62px 30px;gap:6px;padding-left:12px;padding-right:12px}
+  .hdr .hf{display:none}.hdr span:last-child{display:none}
+  .day .felt{display:none}
+  .wh{padding:10px 12px}
+}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+
+</head>
+<body>
+<script id="state" type="application/json">{"entries":{},"wknotes":{},"finish":""}</script>
+<div class="wrap">
+  <header class="bib">
+    <h1><small>TCS New York City Marathon · Nov 1, 2026</small>SUB 4:30</h1>
+    <div class="meta">
+      <div><b class="num" id="days">—</b><span>days out</span></div>
+      <div><b class="num">10:18</b><span>per mile needed</span></div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b class="num"><span id="runsDone">0</span><i>/ 48</i></b><span>runs logged</span></div>
+    <div class="stat"><b class="num"><span id="milesDone">0</span><i>/ <span id="milesPlan">0</span></i></b><span>miles logged</span></div>
+    <div class="stat"><b class="num" id="longest">—</b><span>longest run so far</span></div>
+    <div class="stat"><b class="num" id="avgMp">—</b><span>avg logged pace</span></div>
+  </div>
+  <div class="bar"><i id="barFill"></i></div>
+  <div class="barlabel"><span>Aug 24</span><span id="barPct">0% of plan miles</span><span>Nov 1</span></div>
+
+  <div class="paces">
+    <div class="pace"><b>11:30–12:00</b><span>easy</span></div>
+    <div class="pace"><b>11:30</b><span>long</span></div>
+    <div class="pace mp"><b>10:15</b><span>race pace (MP)</span></div>
+    <div class="pace"><b>9:45</b><span>tempo</span></div>
+  </div>
+
+  <h2>The ten weeks <small>tap a week to open it · check a run when it's done</small></h2>
+  <div id="weeks"></div>
+
+  <h2>Race day</h2>
+  <div class="race">
+    <table>
+      <thead><tr><th>Miles</th><th>Pace</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td class="p">1–3</td><td class="p num">10:45</td><td>Verrazzano. Let them pass you.</td></tr>
+        <tr><td class="p">4–14</td><td class="p num">10:15</td><td>Brooklyn. Halfway at 2:15:30.</td></tr>
+        <tr><td class="p">15–16</td><td class="p num">10:45</td><td>Queensboro. No watch.</td></tr>
+        <tr class="key"><td class="p">17–23</td><td class="p num">10:10</td><td>First Ave and the Bronx. This is the race.</td></tr>
+        <tr><td class="p">24–26.2</td><td class="p">hold</td><td>Fifth Ave is a hill. Expect 10:30, don't panic.</td></tr>
+      </tbody>
+    </table>
+    <div class="foot">
+      <div>Gel at 45 / 90 / 135 / 180 / 225 minutes.</div>
+      <div>Drink at every station from mile 2.</div>
+    </div>
+    <div class="result">
+      <div><div class="eyebrow">Finish time</div><input id="finish" class="num" placeholder="4:29:59" maxlength="8" aria-label="Finish time"></div>
+      <div class="verdict" id="verdict">—</div>
+    </div>
+  </div>
+
+  <h2>Rules</h2>
+  <div class="rules">
+    <div class="rule"><b>Sunday is the plan.</b>Never skip it. Never double it.</div>
+    <div class="rule"><b>Easy means easy.</b>Slower than feels right. That's the point.</div>
+    <div class="rule"><b>Stride rule.</b>Pain that changes your stride ends the run.</div>
+    <div class="rule"><b>Practice gels.</b>Every 45 minutes on the 20 and the 22.</div>
+    <div class="rule"><b>Week 7 is the test.</b>Close the 20 at 10:15 with gas left: go for 4:30. Hanging on: aim 4:35.</div>
+  </div>
+
+  <div class="status"><span id="status"></span></div>
+  <div class="footer">
+    <span id="saveMode">Loading…</span>
+    <button id="exportBtn" type="button">Copy log as text</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PLAN = [
+    {n:1, start:'2026-08-24', days:{tue:[4,'E'],wed:[4,'E'],thu:[5,'2 @ MP'],sat:[4,'E'],sun:[12,'long']}, note:''},
+    {n:2, start:'2026-08-31', days:{tue:[4,'E'],wed:[5,'E'],thu:[6,'3 @ MP'],sat:[4,'E'],sun:[14,'long']}, note:''},
+    {n:3, start:'2026-09-07', days:{tue:[5,'E'],wed:[5,'E'],thu:[6,'4 @ MP'],sat:[4,'E'],sun:[16,'long']}, note:''},
+    {n:4, start:'2026-09-14', days:{tue:[4,'E'],wed:[4,'E'],thu:[5,'easy'],sat:[4,'E'],sun:[12,'long']}, note:'Rest week', tag:'rest'},
+    {n:5, start:'2026-09-21', days:{tue:[5,'E'],wed:[5,'E'],thu:[7,'5 @ MP'],sat:[4,'E'],sun:[18,'last 5 @ MP']}, note:''},
+    {n:6, start:'2026-09-28', days:{tue:[5,'E'],wed:[5,'E'],thu:[6,'3 tempo @ 9:45'],sat:[4,'E'],sun:[14,'long']}, note:''},
+    {n:7, start:'2026-10-05', days:{tue:[5,'E'],wed:[5,'E'],thu:[7,'5 @ MP'],sat:[4,'E'],sun:[20,'last 6 @ MP']}, note:'The test', tag:'test'},
+    {n:8, start:'2026-10-12', days:{tue:[5,'E'],wed:[5,'E'],thu:[6,'4 @ MP'],sat:[4,'E'],sun:[22,'last 6 @ MP']}, note:'Peak', tag:'peak'},
+    {n:9, start:'2026-10-19', days:{tue:[4,'E'],wed:[4,'E'],thu:[5,'3 @ MP'],sat:[3,'E'],sun:[12,'long']}, note:''},
+    {n:10,start:'2026-10-26', days:{tue:[4,'E'],wed:[3,'E + strides'],thu:[2,'E'],sat:[0,'off'],sun:[26.2,'RACE']}, note:'Race week', tag:'race'},
+  ];
+  const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+  const DN = {mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
+  const RACE = new Date('2026-11-01T09:00:00-05:00');
+  const $ = s => document.querySelector(s);
+
+  let state = {entries:{}, wknotes:{}, finish:''};
+  let artifact = null, saveTimer = null, cloud = true;
+
+  function dkey(w,d){ return 'w'+w+'-'+d; }
+  function dateOf(start, d){ const dt = new Date(start+'T12:00:00'); dt.setDate(dt.getDate()+DAYS.indexOf(d)); return dt; }
+  function fmtDate(dt){ return (dt.getMonth()+1)+'/'+dt.getDate(); }
+  function isoLocal(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+  const todayIso = isoLocal(new Date());
+
+  function render(){
+    const host = $('#weeks'); host.innerHTML = '';
+    let openSet = false;
+    PLAN.forEach(w => {
+      const el = document.createElement('section'); el.className = 'week';
+      const planTotal = Object.values(w.days).reduce((a,[m])=>a+m,0);
+      let logged = 0, doneRuns = 0, runs = 0, hasToday = false;
+      const dayRows = DAYS.map(d => {
+        const p = w.days[d]; const dt = dateOf(w.start,d); const iso = isoLocal(dt);
+        const isToday = iso === todayIso; if (isToday) hasToday = true;
+        const k = dkey(w.n,d); const e = state.entries[k] || {};
+        if (!p || p[0]===0) return `<div class="day off${isToday?' today':''}"><div class="dn">${DN[d]}<em>${fmtDate(dt)}</em></div><div class="plan">off</div><div></div><div></div><div class="felt"></div><div></div></div><div class="noterow"></div>`;
+        runs++; if (e.done) { doneRuns++; logged += parseFloat(e.miles)||p[0]; }
+        const isRace = p[1]==='RACE';
+        return `<div class="day${e.done?' done':''}${isToday?' today':''}${e.note?' has-note':''}" data-k="${k}">
+          <div class="dn">${DN[d]}<em>${fmtDate(dt)}</em></div>
+          <div class="plan"><b>${isRace?'26.2 · RACE':p[0]+' mi · '+p[1]}</b>${isRace?'<span class="sub">Sub 4:30. You know the plan.</span>':''}</div>
+          <div><input inputmode="decimal" placeholder="${p[0]}" value="${e.miles||''}" data-f="miles" aria-label="Miles run"></div>
+          <div><input placeholder="pace" value="${e.pace||''}" data-f="pace" aria-label="Pace per mile"></div>
+          <div class="felt"><select data-f="felt" aria-label="How it felt"><option value="">felt</option>${[1,2,3,4,5].map(n=>`<option ${e.felt==n?'selected':''} value="${n}">${['','rough','meh','fine','good','strong'][n]}</option>`).join('')}</select></div>
+          <div class="chk"><input type="checkbox" ${e.done?'checked':''} data-f="done" aria-label="Done"></div>
+        </div>
+        <div class="noterow"><textarea class="note" data-k="${k}" placeholder="note (legs, sleep, weather, what you learned)">${esc(e.note||'')}</textarea></div>`;
+      }).join('');
+      const complete = doneRuns===runs;
+      if (hasToday) { el.classList.add('now','open'); openSet = true; }
+      el.innerHTML = `
+        <div class="wh" role="button" tabindex="0" aria-expanded="${hasToday}">
+          <div class="wn">${w.n}<em>WEEK</em></div>
+          <div class="wt"><b>${fmtDate(new Date(w.start+'T12:00:00'))} – ${fmtDate(dateOf(w.start,'sun'))}</b> · long run <b>${w.days.sun[0]}</b>${w.days.sun[1]!=='long'&&w.days.sun[1]!=='RACE'?' ('+w.days.sun[1]+')':''}${w.tag?`<span class="tag${w.tag==='rest'?' q':''}">${w.note}</span>`:''}${complete?'<span class="tag done">done</span>':''}</div>
+          <div class="wr"><b class="num">${fmt(logged)} / ${fmt(planTotal)}</b>mi · ${doneRuns}/${runs} runs</div>
+        </div>
+        <div class="days">
+          <div class="hdr"><span>Day</span><span>Plan</span><span>Miles</span><span>Pace</span><span class="hf">Felt</span><span></span></div>
+          ${dayRows}
+          <div class="wknote"><label>Week ${w.n} in one line</label><input data-wk="${w.n}" value="${esc(state.wknotes[w.n]||'')}" placeholder="one note for next week" style="font:inherit;font-size:14px;padding:8px 10px;border:1px dashed var(--line-2);border-radius:6px;background:transparent;color:var(--ink)"></div>
+        </div>`;
+      host.appendChild(el);
+    });
+    if (!openSet) { const first = host.querySelector('.week'); if (first) first.classList.add('open'); }
+    renderStats();
+    $('#finish').value = state.finish||''; verdict();
+  }
+
+  function renderStats(){
+    let runs=0, miles=0, longest=0, planMiles=0, paces=[];
+    PLAN.forEach(w => Object.entries(w.days).forEach(([d,[m,t]]) => {
+      if (!m || t==='RACE') return; planMiles += m;
+      const e = state.entries[dkey(w.n,d)]; if (!e||!e.done) return;
+      runs++; const mi = parseFloat(e.miles)||m; miles += mi; longest = Math.max(longest, mi);
+      const s = parsePace(e.pace); if (s) paces.push(s);
+    }));
+    $('#runsDone').textContent = runs; $('#milesDone').textContent = fmt(miles); $('#milesPlan').textContent = fmt(planMiles);
+    $('#longest').textContent = longest ? fmt(longest)+' mi' : '—';
+    $('#avgMp').textContent = paces.length ? fmtPace(paces.reduce((a,b)=>a+b,0)/paces.length) : '—';
+    const pct = planMiles ? Math.round(miles/planMiles*100) : 0;
+    $('#barFill').style.width = Math.min(100,pct)+'%'; $('#barPct').textContent = pct+'% of plan miles';
+    const d = Math.ceil((RACE - new Date())/86400000); $('#days').textContent = d>0? d : (d===0?'today':'done');
+  }
+  function verdict(){
+    const s = parseTime(state.finish); const v = $('#verdict'); v.className='verdict';
+    if (!s) { v.textContent='—'; return; }
+    if (s < 4*3600+30*60) { v.textContent='SUB 4:30. Done.'; v.classList.add('yes'); }
+    else if (s < 4*3600+47*60+10) { v.textContent='PR. Not the goal, but a PR.'; v.classList.add('no'); }
+    else { v.textContent='Next year.'; v.classList.add('no'); }
+  }
+  function parsePace(p){ if(!p) return 0; const m = String(p).trim().match(/^(\d{1,2})[:.](\d{2})$/); return m? (+m[1])*60+(+m[2]) : 0; }
+  function parseTime(t){ if(!t) return 0; const m = String(t).trim().match(/^(\d):(\d{2}):(\d{2})$/); return m? (+m[1])*3600+(+m[2])*60+(+m[3]) : 0; }
+  function fmtPace(s){ return Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0'); }
+  function fmt(n){ return Number.isInteger(n)? n : n.toFixed(1); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+  // events
+  document.addEventListener('click', e => {
+    const h = e.target.closest('.wh'); if (!h) return;
+    const w = h.parentElement; w.classList.toggle('open'); h.setAttribute('aria-expanded', w.classList.contains('open'));
+  });
+  document.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('wh')) { e.preventDefault(); e.target.click(); } });
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.f) {
+      const k = t.closest('.day').dataset.k; const en = state.entries[k] = state.entries[k]||{};
+      en[t.dataset.f] = t.type==='checkbox' ? t.checked : t.value;
+      if (t.type==='checkbox') { render(); } else { t.closest('.day').classList.toggle('has-note', !!en.note); queueStats(); }
+      save();
+    } else if (t.classList.contains('note')) {
+      const en = state.entries[t.dataset.k] = state.entries[t.dataset.k]||{}; en.note = t.value; save();
+    } else if (t.dataset.wk) { state.wknotes[t.dataset.wk] = t.value; save(); }
+    else if (t.id==='finish') { state.finish = t.value; verdict(); save(); }
+  });
+  let statsT; function queueStats(){ clearTimeout(statsT); statsT = setTimeout(()=>{ const open = [...document.querySelectorAll('.week.open')].map(w=>w.querySelector('.wn').firstChild.textContent); render(); document.querySelectorAll('.week').forEach(w=>{ if(open.includes(w.querySelector('.wn').firstChild.textContent)) w.classList.add('open'); else w.classList.remove('open'); }); }, 900); }
+
+  $('#exportBtn').addEventListener('click', async () => {
+    const lines = ['SUB 4:30 · NYC Marathon 11/1/26'];
+    PLAN.forEach(w => { lines.push(''); lines.push('Week '+w.n+(state.wknotes[w.n]?' — '+state.wknotes[w.n]:'')); DAYS.forEach(d => { const e = state.entries[dkey(w.n,d)]; if (!e||!e.done) return; lines.push('  '+DN[d]+' '+fmtDate(dateOf(w.start,d))+': '+(e.miles||w.days[d][0])+' mi'+(e.pace?' @ '+e.pace:'')+(e.felt?' · felt '+e.felt+'/5':'')+(e.note?' · '+e.note:'')); }); });
+    if (state.finish) lines.push('', 'Finish: '+state.finish);
+    try { await navigator.clipboard.writeText(lines.join('\n')); flash('Copied'); } catch(_) { flash('Could not copy', true); }
+  });
+
+  // persistence
+  function flash(msg, warn){ const s = $('#status'); s.textContent = msg; s.className = 'show'+(warn?' warn':''); clearTimeout(s._t); s._t = setTimeout(()=>s.className='', 1800); }
+  let mode = 'files';
+  function save(){
+    localStorage.setItem('sub430', JSON.stringify(state));
+    if (!artifact || !cloud) return;
+    clearTimeout(saveTimer); flash('Saving…');
+    saveTimer = setTimeout(doSave, 2500);
+  }
+  async function doSave(){
+    const json = JSON.stringify(state);
+    if (mode === 'files') {
+      try { await artifact.publish({'data/log.json': json}); flash('Saved'); return; }
+      catch (err) {
+        const c = err && err.code;
+        if (c==='conflict') { flash('Newer version loading…'); return; }
+        if (c==='rate_limited') { flash('Slow down, will retry', true); setTimeout(save, 8000); return; }
+        if (c==='capability_disabled' || c==='read_only_path' || c==='capability_removed' || c==='transform_error' || c==='invalid_content') { mode = 'html'; }
+        else { offline(c); return; }
+      }
+    }
+    try {
+      let src = pageSource;
+      if (!src) { const r = await fetch(location.href, {cache:'no-store'}); src = await r.text(); pageSource = src; }
+      const re = /<script id="state" type="application\/json">[\s\S]*?<\/script>/;
+      if (!re.test(src)) { offline('no-state-block'); return; }
+      const html = src.replace(re, '<script id="state" type="application/json">'+json.replace(/<\//g,'<\\/')+'</script>');
+      if (!/^\s*<!doctype html>/i.test(html)) { offline('not-full-doc'); return; }
+      sessionStorage.setItem('sub430-open', JSON.stringify([...document.querySelectorAll('.week.open')].map(w=>w.querySelector('.wn').firstChild.textContent)));
+      flash('Saving to page…');
+      await artifact.publish(html); flash('Saved');
+    } catch (err) {
+      const c = err && err.code;
+      if (c==='conflict') { flash('Newer version loading…'); return; }
+      if (c==='rate_limited') { flash('Slow down, will retry', true); setTimeout(save, 8000); return; }
+      offline(c || (err && err.message) || 'unknown');
+    }
+  }
+  let pageSource = null;
+  function offline(code){ cloud = false; $('#saveMode').textContent = 'Saved on this device only ('+code+')'; flash('Saved on this device only', true); }
+  async function load(){
+    let remote = null;
+    try { const r = await fetch('data/log.json', {cache:'no-store'}); if (r.ok) remote = await r.json(); } catch(_) {}
+    let embedded = null; try { embedded = JSON.parse(document.getElementById('state').textContent); } catch(_) {}
+    let local = null; try { local = JSON.parse(localStorage.getItem('sub430')||'null'); } catch(_) {}
+    const count = s => s ? Object.values(s.entries||{}).filter(e=>e.done).length + Object.values(s.entries||{}).filter(e=>e.note||e.miles).length : -1;
+    const cands = [remote, embedded, local].filter(Boolean);
+    state = cands.sort((a,b)=>count(b)-count(a))[0] || state;
+    state.entries = state.entries||{}; state.wknotes = state.wknotes||{};
+    render();
+    try { const open = JSON.parse(sessionStorage.getItem('sub430-open')||'null'); if (open) { document.querySelectorAll('.week').forEach(w=>{ const n=w.querySelector('.wn').firstChild.textContent; w.classList.toggle('open', open.includes(n)); }); sessionStorage.removeItem('sub430-open'); } } catch(_) {}
+    try { artifact = (window.claude && claude.use) ? await claude.use('artifact') : null; } catch(_) { artifact = null; }
+    if (!artifact) { $('#saveMode').textContent = 'Saves in this browser. Use Copy log to move it.'; return; }
+    $('#saveMode').textContent = 'Entries save to this page and follow you across devices';
+    if (local && count(local) > Math.max(count(remote), count(embedded))) save();
+  }
+  load();
+})();
+</script>
+
+</body>
+</html>
