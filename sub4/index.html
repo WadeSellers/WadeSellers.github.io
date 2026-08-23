@@ -44,7 +44,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 
 /* ROAD */
 .world{position:relative;width:100%;}
-.world img.chunk{display:block;width:100%;contain:strict}
+.world canvas.chunk{display:block;contain:strict}
 #chunks{position:relative}
 .world .hud{position:absolute;inset:0;pointer-events:none}
 .sign{position:absolute;width:var(--cw);pointer-events:auto;margin-top:-48px}
@@ -244,11 +244,13 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
       const inside = items.filter(it => it.y1 >= y0-10 && it.y0 <= y1+10).map(it=>it.html).join('');
       CHUNKS.push({y0, h, inside, make: tl => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${y0} ${vw} ${h}" width="${vw}" height="${h}"><rect x="0" y="${y0}" width="${vw}" height="${h}" fill="#10171F"/>${inside}${roadLayers(tl)}</svg>`});
     }
-    world.innerHTML = CHUNKS.map((c,i) => `<img class="chunk" id="ch${i}" alt="" width="${vw}" height="${c.h}" style="height:${c.h}px" decoding="async">`).join('');
+    const SC = Math.min(window.devicePixelRatio||1, 2);
+    world.innerHTML = CHUNKS.map((c,i) => `<canvas class="chunk" id="ch${i}" width="${Math.round(vw*SC)}" height="${Math.round(c.h*SC)}" style="width:${vw}px;height:${c.h}px"></canvas>`).join('');
+    CHUNKS.SC = SC;
     world.style.height = H + 'px';
     svg = meas; // geometry only
     FINISH_Y = fy; BRIDGE = {x:(ap.x+bp.x)/2, y:by+36};
-    roadPath = probe; // keep the measuring path for geometry runnerEl = $('#runnerH'); runnerEl.innerHTML = runnerSVG(); total = roadPath.getTotalLength();
+    roadPath = probe; runnerEl = $('#runnerH'); runnerEl.innerHTML = runnerSVG(); total = roadPath.getTotalLength();
     // precompute path length at each run point
     RUNS.forEach((r,i) => { r.p = pts[i]; r.len = 0; r._bd = 1e9; });
     LUT = []; const STEP = 5;
@@ -306,7 +308,13 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
       const key = (tl > 0 && c.y0 <= lutPoint(tl).y + 60) ? tl : 0;  // chunks past the trail end never change
       if (c.key === key) return; c.key = key;
       const blob = new Blob([c.make(key)], {type:'image/svg+xml'}); const u = URL.createObjectURL(blob);
-      const img = document.getElementById('ch'+i); const old = img.src; img.src = u; if (old && old.startsWith('blob:')) setTimeout(()=>URL.revokeObjectURL(old), 2000);
+      const img = new Image(); img.onload = () => {
+        const cv = document.getElementById('ch'+i); if (!cv) return;
+        const ctx = cv.getContext('2d'); ctx.setTransform(CHUNKS.SC,0,0,CHUNKS.SC,0,0); ctx.clearRect(0,0,cv.width,cv.height); ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(u);
+      };
+      img.onerror = () => URL.revokeObjectURL(u);
+      img.src = u;
     });
   }
   function renderStats(){
