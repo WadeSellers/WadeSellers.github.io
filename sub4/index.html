@@ -20,7 +20,7 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:auto}
-body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.45;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.45;overflow-x:clip;-webkit-font-smoothing:antialiased}
 .cond{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif}
 .num{font-variant-numeric:tabular-nums}
 
@@ -47,7 +47,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 .world svg.chunk{display:block;width:100%;contain:strict}
 #chunks{position:relative}
 .world .hud{position:absolute;inset:0;pointer-events:none}
-.sign{position:absolute;width:var(--cw);pointer-events:auto;transform:translateY(-50%)}
+.sign{position:absolute;width:var(--cw);pointer-events:auto;margin-top:-48px}
 .sign .post{position:absolute;top:50%;height:2px;background:var(--dash);width:var(--pw)}
 .sign.L .post{left:100%}
 .sign.R .post{right:100%}
@@ -111,7 +111,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 .status{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--accent);border-radius:999px;padding:7px 14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
 .status.show{opacity:1}
 .status.warn{border-color:var(--accent2);color:var(--accent2)}
-canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:none}
 </style>
 </head>
 <body>
@@ -209,7 +209,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
       const p = probe.getPointAtLength(s), q = probe.getPointAtLength(Math.min(L,s+2));
       const nx = -(q.y-p.y), ny = (q.x-p.x); const nl = Math.hypot(nx,ny)||1;
       for (const side of [-1,1]){
-        if (R() > (vw < 600 ? 0.30 : 0.42)) continue;
+        if (R() > (vw < 600 ? 0.20 : 0.42)) continue;
         const off = 70 + R()*140 + (vw<600? 0 : 40);
         const tx = p.x + nx/nl*off*side, ty = p.y + ny/nl*off*side;
         if (tx < 10 || tx > vw-10) continue;
@@ -394,9 +394,9 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
 
   // ---- confetti
   function confetti(){
-    const c = $('#confetti'), ctx = c.getContext('2d'); c.width = innerWidth; c.height = innerHeight;
+    const c = $('#confetti'), ctx = c.getContext('2d'); c.style.display='block'; c.width = innerWidth; c.height = innerHeight;
     const ps = Array.from({length:220},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*0.5,vx:(Math.random()-0.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,a:Math.random()*6,col:['#F26B21','#FFB067','#5DD39E','#FFFFFF','#F2C66D'][Math.floor(Math.random()*5)]}));
-    let t=0; (function frame(){ ctx.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=0.1;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.col;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);ctx.restore();}); if (++t<260) requestAnimationFrame(frame); else ctx.clearRect(0,0,c.width,c.height); })();
+    let t=0; (function frame(){ ctx.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=0.1;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.col;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);ctx.restore();}); if (++t<260) requestAnimationFrame(frame); else { ctx.clearRect(0,0,c.width,c.height); c.style.display='none'; } })();
   }
 
   // ---- persistence
