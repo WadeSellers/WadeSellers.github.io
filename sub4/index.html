@@ -411,6 +411,9 @@ body{overflow-x:clip}
     zoneY.forEach(z => { const a = Math.max(0, z.y0)/H, b = Math.min(H, z.y1)/H; const i = document.createElement('i'); i.className='z'; i.style.top = (a*100)+'%'; i.style.height = ((b-a)*100)+'%'; i.style.background = z.park ? '#2C7A4E' : z.bld[0]; i.style.opacity = .8; mini.insertBefore(i, mini.firstChild); });
   }
 
+  // ================= GATE =================
+  const PIN = '6969';
+  function unlocked(){ if (localStorage.getItem('sub4-pin') === PIN) return true; const k = prompt("This is Wade's marathon. Code?"); if (k === null) return false; if (k.trim() === PIN){ localStorage.setItem('sub4-pin', PIN); flash('Unlocked'); return true; } flash("Nope. Not your marathon.", true); return false; }
   // ================= EVENTS =================
   window.addEventListener('scroll', loop, {passive:true});
   let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => {
@@ -419,13 +422,14 @@ body{overflow-x:clip}
   }, 120); });
   document.addEventListener('click', e => {
     const btn = e.target.closest('button[data-f=done]');
-    if (btn){ const k = btn.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en.done = !en.done; save(); const open = [...document.querySelectorAll('.sign.open')].map(s=>s.dataset.k); renderSigns(); open.forEach(k2 => { const s = document.querySelector(`.sign[data-k="${k2}"]`); if (s) s.classList.add('open'); }); if (en.done) flash('Banked.'); return; }
+    if (btn){ if (!unlocked()) return; const k = btn.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en.done = !en.done; save(); const open = [...document.querySelectorAll('.sign.open')].map(s=>s.dataset.k); renderSigns(); open.forEach(k2 => { const s = document.querySelector(`.sign[data-k="${k2}"]`); if (s) s.classList.add('open'); }); if (en.done) flash('Banked.'); return; }
     if (e.target.closest('.log')) return;
     if (e.target.id === 'exportBtn'){ exportLog(); return; }
     const sign = e.target.closest('.sign'); if (sign){ sign.classList.toggle('open'); return; }
     if (e.target.closest('#mini')){ const r = $('#mini').getBoundingClientRect(); const f = (e.clientY - r.top)/r.height; window.scrollTo({top: f*(H-vh), behavior:'smooth'}); }
   });
-  document.addEventListener('input', e => { const t = e.target; if (t.dataset.f && t.dataset.f!=='done'){ const k = t.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en[t.dataset.f] = t.value; save(); hudStats(); } else if (t.id==='finish'){ state.finish = t.value; verdict(true); save(); } });
+  document.addEventListener('focusin', e => { const t = e.target; if ((t.dataset.f && t.dataset.f!=='done') || t.id==='finish'){ if (localStorage.getItem('sub4-pin') !== PIN){ t.blur(); unlocked(); } } });
+  document.addEventListener('input', e => { const t = e.target; if (localStorage.getItem('sub4-pin') !== PIN) return; if (t.dataset.f && t.dataset.f!=='done'){ const k = t.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en[t.dataset.f] = t.value; save(); hudStats(); } else if (t.id==='finish'){ state.finish = t.value; verdict(true); save(); } });
   async function exportLog(){ const lines = ['SUB 4 · NYC Marathon 11/1/26']; let cw=0; RUNS.forEach(r => { const e = state.entries[r.k]; if (!e||!e.done) return; if (r.w.n!==cw){ cw=r.w.n; lines.push('', 'Week '+cw); } lines.push('  '+DN[r.d]+' '+fmtDate(r.dt)+': '+(e.miles||r.mi)+' mi'+(e.pace?' @ '+e.pace:'')+(e.felt?' · felt '+e.felt+'/5':'')+(e.note?' · '+e.note:'')); }); if (state.finish) lines.push('', 'Finish: '+state.finish); try { await navigator.clipboard.writeText(lines.join('\n')); flash('Copied'); } catch(_) { flash('Could not copy', true); } }
 
   // ================= BOOT =================
