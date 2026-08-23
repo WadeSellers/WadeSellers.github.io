@@ -44,7 +44,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 
 /* ROAD */
 .world{position:relative;width:100%;}
-.world svg.chunk{display:block;width:100%;contain:strict}
+.world img.chunk{display:block;width:100%;contain:strict}
 #chunks{position:relative}
 .world .hud{position:absolute;inset:0;pointer-events:none}
 .sign{position:absolute;width:var(--cw);pointer-events:auto;margin-top:-48px}
@@ -77,6 +77,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 .sign.done .log button{background:var(--line);color:var(--ink2)}
 .marker{position:absolute;transform:translate(-50%,-50%);font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:13px;letter-spacing:.08em;background:var(--ground);border:2px solid var(--dash);color:var(--ink2);padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none}
 .marker b{color:var(--accent2);font-size:15px}
+.marker.big{background:none;border:0;font-size:34px}.marker.big b{color:var(--accent);font-size:34px}
 .board{position:absolute;width:min(300px,44vw);background:#0B1018;border:2px solid var(--road-edge);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink2);pointer-events:auto;transform:translateY(-50%)}
 .board h4{margin:0 0 4px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--ink);letter-spacing:.04em}
 .board p{margin:0 0 4px}
@@ -188,7 +189,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
 
   // ---- build world
   const world = $('#chunks'), hud = $('#hud'); let svg = null;
-  let W = 0, H = 0, roadPath, trailPath, runnerEl, total = 0, pts = [], cardW = 0, LUT = [];
+  let W = 0, H = 0, roadPath, trailPath, runnerEl, total = 0, pts = [], cardW = 0, LUT = [], CHUNKS = [], FINISH_Y = 0, BRIDGE = null, urls = [];
   function build(){
     const vw = document.documentElement.clientWidth; W = Math.min(vw, 920);
     const step = vw < 600 ? 230 : 250; H = RUNS.length*step + 520;
@@ -213,40 +214,41 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
         const off = 70 + R()*140 + (vw<600? 0 : 40);
         const tx = p.x + nx/nl*off*side, ty = p.y + ny/nl*off*side;
         if (tx < 10 || tx > vw-10) continue;
-        const sz = 10 + R()*16; const c = ['var(--tree1)','var(--tree2)','var(--tree3)'][Math.floor(R()*3)];
-        const th = R() < 0.7 ? `<path d="M${tx} ${ty-sz*2} l${sz*0.8} ${sz*2} h${-sz*1.6} z" fill="${c}"/><rect x="${tx-2}" y="${ty}" width="4" height="${sz*0.5}" fill="var(--trunk)"/>` : `<circle cx="${tx}" cy="${ty-sz}" r="${sz*0.9}" fill="${c}"/><rect x="${tx-2}" y="${ty-sz*0.2}" width="4" height="${sz*0.6}" fill="var(--trunk)"/>`;
+        const sz = 10 + R()*16; const c = ['#1F5A3C','#2C7A4E','#3E9A5E'][Math.floor(R()*3)];
+        const th = R() < 0.7 ? `<path d="M${tx} ${ty-sz*2} l${sz*0.8} ${sz*2} h${-sz*1.6} z" fill="${c}"/><rect x="${tx-2}" y="${ty}" width="4" height="${sz*0.5}" fill="#4A3526"/>` : `<circle cx="${tx}" cy="${ty-sz}" r="${sz*0.9}" fill="${c}"/><rect x="${tx-2}" y="${ty-sz*0.2}" width="4" height="${sz*0.6}" fill="#4A3526"/>`;
         treeItems.push({y0:ty-sz*2, y1:ty+sz, html:th});
       }
     }
-    probe.remove();
     // skyline near the end
     let sky = ''; { const baseY = H-330; let x = 0; const R2 = rnd(7); while (x < vw){ const w = 18+R2()*34, h = 40+R2()*150; sky += `<rect x="${x}" y="${baseY-h}" width="${w}" height="${h}" fill="#1B2436"/>`; for(let wy=baseY-h+8; wy<baseY-6; wy+=12){ for(let wx=x+4; wx<x+w-4; wx+=8){ if (R2()<0.35) sky += `<rect x="${wx}" y="${wy}" width="3" height="5" fill="#F2C66D" opacity=".8"/>`; } } x += w + 4 + R2()*10; } }
     // finish tape + gate
     const fy = endP.y; const tape = `<g><rect x="${cx-120}" y="${fy-70}" width="6" height="80" fill="#C9CED8"/><rect x="${cx+114}" y="${fy-70}" width="6" height="80" fill="#C9CED8"/>` +
       Array.from({length:24},(_,i)=>`<rect x="${cx-120+i*10}" y="${fy-70}" width="10" height="10" fill="${i%2?'#fff':'#111'}"/><rect x="${cx-120+i*10}" y="${fy-60}" width="10" height="10" fill="${i%2?'#111':'#fff'}"/>`).join('') +
-      `<text x="${cx}" y="${fy-82}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="34" fill="var(--accent)">FINISH</text></g>`;
+      `</g>`;
     // Verrazzano bridge at race start: between last training run and race
     const rIdx = RUNS.findIndex(r=>r.race); const bp = pts[rIdx], ap = pts[rIdx-1]; const by = ap.y + (bp.y-ap.y)*0.74;
-    const bridge = `<g opacity=".9"><rect x="${Math.min(ap.x,bp.x)-40}" y="${by-8}" width="${Math.abs(ap.x-bp.x)+80}" height="16" fill="#3C4556"/><path d="M${Math.min(ap.x,bp.x)-40} ${by-8} Q ${(ap.x+bp.x)/2} ${by-110} ${Math.max(ap.x,bp.x)+40} ${by-8}" stroke="#8B93A3" stroke-width="4" fill="none"/>${Array.from({length:9},(_,i)=>{const x=Math.min(ap.x,bp.x)-40+i*(Math.abs(ap.x-bp.x)+80)/8; return `<line x1="${x}" y1="${by-8}" x2="${x}" y2="${by-60}" stroke="#8B93A3" stroke-width="2"/>`}).join('')}<text x="${(ap.x+bp.x)/2}" y="${by-118}" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="14" fill="var(--ink2)" letter-spacing="2">VERRAZZANO</text></g>`;
+    const bridge = `<g opacity=".9"><rect x="${Math.min(ap.x,bp.x)-40}" y="${by-8}" width="${Math.abs(ap.x-bp.x)+80}" height="16" fill="#3C4556"/><path d="M${Math.min(ap.x,bp.x)-40} ${by-8} Q ${(ap.x+bp.x)/2} ${by-110} ${Math.max(ap.x,bp.x)+40} ${by-8}" stroke="#8B93A3" stroke-width="4" fill="none"/>${Array.from({length:9},(_,i)=>{const x=Math.min(ap.x,bp.x)-40+i*(Math.abs(ap.x-bp.x)+80)/8; return `<line x1="${x}" y1="${by-8}" x2="${x}" y2="${by-60}" stroke="#8B93A3" stroke-width="2"/>`}).join('')}</g>`;
     // water under bridge
     const water = `<rect x="0" y="${by-4}" width="${vw}" height="60" fill="#0F2235" opacity=".8"/>`;
     // collect placed elements with y-extents so each chunk only carries what's inside it
-    const items = []; // {y0,y1,html}
+    const items = [];
     treeItems.forEach(t => items.push(t));
     items.push({y0:H-330-200, y1:H-330, html:sky});
     items.push({y0:by-4, y1:by+60, html:water});
     items.push({y0:by-130, y1:by+20, html:bridge});
     items.push({y0:fy-95, y1:fy+15, html:tape});
-    const CH = 1000; const n = Math.ceil(H/CH); let chunks = '';
-    const roadLayers = `<path d="${d}" stroke="var(--road-edge)" stroke-width="46" fill="none" stroke-linecap="round"/><path class="roadP" d="${d}" stroke="var(--road)" stroke-width="38" fill="none" stroke-linecap="round"/><path d="${d}" stroke="var(--dash)" stroke-width="3" fill="none" stroke-dasharray="18 22" opacity=".7"/><path class="trailP" d="${d}" stroke="var(--accent)" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="0 999999" opacity=".95"/>`;
+    CHUNKS = []; const CH = 1000; const n = Math.ceil(H/CH);
+    const roadLayers = tl => `<path d="${d}" stroke="#3C4556" stroke-width="46" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#2A3140" stroke-width="38" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#8B93A3" stroke-width="3" fill="none" stroke-dasharray="18 22" opacity=".7"/>` + (tl>0 ? `<path d="${d}" stroke="#F26B21" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="${tl} 999999" opacity=".95"/>` : '');
     for (let i=0;i<n;i++){
       const y0 = i*CH, y1 = Math.min(H, y0+CH), h = y1-y0;
       const inside = items.filter(it => it.y1 >= y0-10 && it.y0 <= y1+10).map(it=>it.html).join('');
-      chunks += `<svg class="chunk" style="height:${h}px" viewBox="0 ${y0} ${vw} ${h}" width="${vw}" height="${h}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="${y0}" width="${vw}" height="${h}" fill="var(--ground)"/>${inside}${roadLayers}</svg>`;
+      CHUNKS.push({y0, h, inside, make: tl => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${y0} ${vw} ${h}" width="${vw}" height="${h}"><rect x="0" y="${y0}" width="${vw}" height="${h}" fill="#10171F"/>${inside}${roadLayers(tl)}</svg>`});
     }
-    world.innerHTML = chunks;
-    svg = world.querySelector('svg.chunk'); // first chunk: used for geometry only
-    roadPath = svg.querySelector('.roadP'); trailPath = null; runnerEl = $('#runnerH'); runnerEl.innerHTML = runnerSVG(); total = roadPath.getTotalLength();
+    world.innerHTML = CHUNKS.map((c,i) => `<img class="chunk" id="ch${i}" alt="" width="${vw}" height="${c.h}" style="height:${c.h}px" decoding="async">`).join('');
+    world.style.height = H + 'px';
+    svg = meas; // geometry only
+    FINISH_Y = fy; BRIDGE = {x:(ap.x+bp.x)/2, y:by+36};
+    roadPath = probe; // keep the measuring path for geometry runnerEl = $('#runnerH'); runnerEl.innerHTML = runnerSVG(); total = roadPath.getTotalLength();
     // precompute path length at each run point
     RUNS.forEach((r,i) => { r.p = pts[i]; r.len = 0; r._bd = 1e9; });
     LUT = []; const STEP = 5;
@@ -288,6 +290,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
     // race pacing board before the bridge
     const rIdx = RUNS.findIndex(r=>r.race); const rp = RUNS[rIdx].p;
     html += `<div class="board" style="left:${rp.x > cx ? 12 : vw - Math.min(300,vw*0.44) - 12}px;top:${rp.y+300}px"><h4>Race plan</h4><p><b>1–3</b> 9:30. Bridge. Let them go.</p><p><b>4–14</b> 9:05. Half at 1:59.</p><p><b>15–16</b> 9:30. Queensboro. No watch.</p><p><b>17–23</b> 9:00. First Ave. The race.</p><p><b>24–26.2</b> Hold. Fifth Ave is a hill.</p><p>Gel 45/90/135/180/225.</p></div>`;
+    html += `<div class="marker big" style="left:${cx}px;top:${FINISH_Y-88}px"><b>FINISH</b></div><div class="marker" style="left:${BRIDGE.x}px;top:${BRIDGE.y}px">VERRAZZANO</div>`;
     hud.innerHTML = html;
     worldTop = $('#world').getBoundingClientRect().top + window.scrollY;
     updateTrail(); renderStats(); onScroll();
@@ -296,7 +299,15 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8;display:non
   function updateTrail(){
     let last = -1; RUNS.forEach((r,i) => { if ((state.entries[r.k]||{}).done) last = i; });
     const len = last < 0 ? 0 : RUNS[last].len;
-    world.querySelectorAll('.trailP').forEach(t => t.setAttribute('stroke-dasharray', `${len} 999999`));
+    paintChunks(len);
+  }
+  function paintChunks(tl){
+    CHUNKS.forEach((c,i) => {
+      const key = (tl > 0 && c.y0 <= lutPoint(tl).y + 60) ? tl : 0;  // chunks past the trail end never change
+      if (c.key === key) return; c.key = key;
+      const blob = new Blob([c.make(key)], {type:'image/svg+xml'}); const u = URL.createObjectURL(blob);
+      const img = document.getElementById('ch'+i); const old = img.src; img.src = u; if (old && old.startsWith('blob:')) setTimeout(()=>URL.revokeObjectURL(old), 2000);
+    });
   }
   function renderStats(){
     let runs=0, miles=0, paces=[];
