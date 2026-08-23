@@ -42,6 +42,8 @@ body{overflow-x:clip}
 .sign .m{font-size:22px;font-weight:700;line-height:1.05;letter-spacing:-.01em}
 .sign .m small{font-size:12px;font-weight:400;color:#ddd;margin-left:6px;letter-spacing:0}
 .sign .arr{font-size:22px;color:#fff;font-weight:700;padding:0 2px}
+.sign .pc{font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;font-size:17px;color:var(--yellow);letter-spacing:.02em;line-height:1.1;margin-top:2px}
+.sign .pc span{font-family:Helvetica,Arial,sans-serif;font-weight:400;font-size:10px;color:var(--grey);margin-left:3px}
 .sign.done{border-color:var(--orange)}
 .sign.done .b{background:var(--orange)!important;color:#000!important}
 .sign.done .m{text-decoration:line-through;text-decoration-color:var(--orange);text-decoration-thickness:3px;color:#bbb}
@@ -64,6 +66,9 @@ body{overflow-x:clip}
 .start h1 span{color:var(--orange)}
 .start p{margin:8px 0 0;font-size:14px;color:#ddd;text-transform:uppercase;letter-spacing:.16em}
 .start p b{color:var(--yellow)}
+.start .key{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:14px auto 0;max-width:420px;pointer-events:auto}
+.start .key div{background:#000;border:2px solid #fff;border-radius:4px;padding:5px 9px;font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;font-size:17px;color:var(--yellow)}
+.start .key div b{display:block;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:.12em;color:var(--grey)}
 .finish{position:absolute;left:0;right:0;text-align:center;padding:0 16px}
 .finish h2{margin:0;font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;font-size:clamp(64px,18vw,150px);line-height:.9;text-shadow:0 6px 0 #000}
 .finish h2 span{color:var(--orange)}
@@ -117,6 +122,7 @@ body{overflow-x:clip}
   const LINE = ['#EE352E','#00933C','#B933AD','#0039A6','#FF6319','#FCCC0A','#6CBE45','#996633','#A7A9AC','#EE352E'];
   const LINE_DARK = [false,false,false,false,false,true,false,false,true,false];
   const WHY = {easy:'Slower than feels right. 10:30–11:00. Conversational.', long:'10:15. Steady. Finish wanting one more.', RACE:'9:30 on the bridge. 9:05 through Brooklyn, half at 1:59. 9:00 on First Ave. Then everything you have left.', '10K TIME TRIAL':'Warm up a mile, then race 6.2 like it owes you money. Under 52:00 and sub-4 is on. 52–56, we aim 4:15.'};
+  function paceOf(r){ if (r.race) return '9:05 avg'; const w = r.what; if (w==='easy'||w.startsWith('easy')) return '10:30–11:00'; if (w==='long') return '10:15'; if (w.includes('last')) return '10:15 → 9:05'; if (w.includes('MP')) return '10:45 warm · 9:05 MP'; if (w.includes('tempo')) return '10:45 warm · 8:30 tempo'; if (w.includes('TIME TRIAL')) return 'all out · <8:22'; return ''; }
   const RACE_DT = new Date('2026-11-01T09:00:00-05:00');
   const RUNS = [];
   PLAN.forEach(w => ORDER.forEach(d => { const p = w.days[d]; if (!p) return; const dt = new Date(w.start+'T12:00:00'); dt.setDate(dt.getDate()+DOFF[d]); RUNS.push({k:'w'+w.n+'-'+d, w, d, mi:p[0], what:p[1], dt, iso:isoOf(dt), first:d==='tue', race:p[1]==='RACE'}); }));
@@ -237,7 +243,7 @@ body{overflow-x:clip}
   function renderSigns(){
     let html = '';
     const st = RUNS[0].p.y - 380 - vh*0.55;
-    html += `<div class="start" style="top:${Math.max(24, RUNS[0].p.y - 780)}px"><h1>SUB <span>4</span></h1><p>Scroll to run <b>↓</b></p></div>`;
+    html += `<div class="start" style="top:${Math.max(24, RUNS[0].p.y - 780)}px"><h1>SUB <span>4</span></h1><p>Scroll to run <b>↓</b></p><div class="key"><div><b>EASY</b>10:30–11:00</div><div><b>LONG</b>10:15</div><div><b>MP</b>9:05</div><div><b>TEMPO</b>8:30</div><div><b>RACE</b>9:09 needed</div></div></div>`;
     RUNS.forEach((r,i) => {
       const p = r.p, e = state.entries[r.k]||{}; const left = p.x > cx;
       const gapToRoad = ROADW*0.5 + 28;
@@ -248,7 +254,7 @@ body{overflow-x:clip}
       const why = WHY[r.what] || (r.what.includes('MP') ? 'MP = 9:05. Warm up, hit it, cool down.' : r.what.includes('tempo') ? 'Comfortably hard. 8:30. Not a race.' : r.what.includes('strides') ? 'Easy, then 6 × 20s fast and relaxed.' : '');
       html += `<div class="sign${e.done?' done':''}${r.iso===todayIso?' today':''}" data-k="${r.k}" style="left:${L}px;top:${p.y}px;--cw:${cardW}px">
         <div class="b${dark?' dark':''}" style="background:${lc}">${e.done?'✓':wk}</div>
-        <div><div class="d">${r.race?'Sun 11/1 · Race day':DN[r.d]+' '+fmtDate(r.dt)+(r.w.tag&&r.first?' · '+r.w.tag:'')}</div><div class="m">${r.race?'26.2':r.mi} mi<small>${r.race?'THE RACE':r.what}</small></div></div>
+        <div><div class="d">${r.race?'Sun 11/1 · Race day':DN[r.d]+' '+fmtDate(r.dt)+(r.w.tag&&r.first?' · '+r.w.tag:'')}</div><div class="m">${r.race?'26.2':r.mi} mi<small>${r.race?'THE RACE':r.what}</small></div><div class="pc">${paceOf(r)}<span>/mi</span></div></div>
         <div class="arr">${left?'→':'←'}</div>
         <div class="why">${why}</div>
         <div class="log">
