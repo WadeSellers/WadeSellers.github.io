@@ -224,7 +224,7 @@ h2 small{font-family:Barlow,sans-serif;font-size:13px;font-weight:500;color:var(
   const $ = s => document.querySelector(s);
 
   let state = {entries:{}, wknotes:{}, finish:''};
-  let artifact = null, saveTimer = null, cloud = true;
+  let saveTimer = null;
 
   function dkey(w,d){ return 'w'+w+'-'+d; }
   function dateOf(start, d){ const dt = new Date(start+'T12:00:00'); dt.setDate(dt.getDate()+DAYS.indexOf(d)); return dt; }
@@ -331,61 +331,49 @@ h2 small{font-family:Barlow,sans-serif;font-size:13px;font-weight:500;color:var(
     try { await navigator.clipboard.writeText(lines.join('\n')); flash('Copied'); } catch(_) { flash('Could not copy', true); }
   });
 
-  // persistence
+  // persistence: browser + tools-sync worker
+  const SYNC = 'https://tools-sync.wadesellers.workers.dev/v1/sub430/log';
+  const keyOf = () => localStorage.getItem('tools-sync-key') || '';
+  const count = s => s ? Object.values(s.entries||{}).filter(e=>e.done||e.note||e.miles).length + Object.values(s.wknotes||{}).filter(Boolean).length + (s.finish?1:0) : -1;
   function flash(msg, warn){ const s = $('#status'); s.textContent = msg; s.className = 'show'+(warn?' warn':''); clearTimeout(s._t); s._t = setTimeout(()=>s.className='', 1800); }
-  let mode = 'files';
+  function setMode(){
+    const m = $('#saveMode');
+    if (keyOf()) { m.innerHTML = 'Synced across devices · <a href="#" id="keyBtn">change key</a>'; }
+    else { m.innerHTML = 'Saves in this browser only · <a href="#" id="keyBtn">connect sync</a>'; }
+    $('#keyBtn').onclick = e => { e.preventDefault(); const k = prompt('Sync key (from ~/.config/tools-sync/key on the Air):', keyOf()); if (k===null) return; localStorage.setItem('tools-sync-key', k.trim()); setMode(); if (k.trim()) pull().then(save); };
+  }
   function save(){
     localStorage.setItem('sub430', JSON.stringify(state));
-    if (!artifact || !cloud) return;
+    if (!keyOf()) return;
     clearTimeout(saveTimer); flash('Saving…');
-    saveTimer = setTimeout(doSave, 2500);
+    saveTimer = setTimeout(async () => {
+      try {
+        const r = await fetch(SYNC, {method:'PUT', headers:{'Content-Type':'application/json','X-Sync-Key':keyOf()}, body: JSON.stringify(state)});
+        if (r.status===401) { flash('Sync key rejected', true); return; }
+        if (!r.ok) throw new Error(r.status);
+        flash('Saved');
+      } catch (err) { flash('Offline, kept here', true); }
+    }, 1500);
   }
-  async function doSave(){
-    const json = JSON.stringify(state);
-    if (mode === 'files') {
-      try { await artifact.publish({'data/log.json': json}); flash('Saved'); return; }
-      catch (err) {
-        const c = err && err.code;
-        if (c==='conflict') { flash('Newer version loading…'); return; }
-        if (c==='rate_limited') { flash('Slow down, will retry', true); setTimeout(save, 8000); return; }
-        if (c==='capability_disabled' || c==='read_only_path' || c==='capability_removed' || c==='transform_error' || c==='invalid_content') { mode = 'html'; }
-        else { offline(c); return; }
-      }
-    }
+  async function pull(){
+    if (!keyOf()) return;
     try {
-      let src = pageSource;
-      if (!src) { const r = await fetch(location.href, {cache:'no-store'}); src = await r.text(); pageSource = src; }
-      const re = /<script id="state" type="application\/json">[\s\S]*?<\/script>/;
-      if (!re.test(src)) { offline('no-state-block'); return; }
-      const html = src.replace(re, '<script id="state" type="application/json">'+json.replace(/<\//g,'<\\/')+'</script>');
-      if (!/^\s*<!doctype html>/i.test(html)) { offline('not-full-doc'); return; }
-      sessionStorage.setItem('sub430-open', JSON.stringify([...document.querySelectorAll('.week.open')].map(w=>w.querySelector('.wn').firstChild.textContent)));
-      flash('Saving to page…');
-      await artifact.publish(html); flash('Saved');
-    } catch (err) {
-      const c = err && err.code;
-      if (c==='conflict') { flash('Newer version loading…'); return; }
-      if (c==='rate_limited') { flash('Slow down, will retry', true); setTimeout(save, 8000); return; }
-      offline(c || (err && err.message) || 'unknown');
-    }
+      const r = await fetch(SYNC, {headers:{'X-Sync-Key':keyOf()}, cache:'no-store'});
+      if (r.status===401) { flash('Sync key rejected', true); return; }
+      if (r.status===404) return;
+      const remote = await r.json();
+      if (remote && count(remote) >= count(state)) { state = remote; state.entries = state.entries||{}; state.wknotes = state.wknotes||{}; render(); }
+    } catch(_) { flash('Offline, showing local', true); }
   }
-  let pageSource = null;
-  function offline(code){ cloud = false; $('#saveMode').textContent = 'Saved on this device only ('+code+')'; flash('Saved on this device only', true); }
   async function load(){
-    let remote = null;
-    try { const r = await fetch('data/log.json', {cache:'no-store'}); if (r.ok) remote = await r.json(); } catch(_) {}
-    let embedded = null; try { embedded = JSON.parse(document.getElementById('state').textContent); } catch(_) {}
     let local = null; try { local = JSON.parse(localStorage.getItem('sub430')||'null'); } catch(_) {}
-    const count = s => s ? Object.values(s.entries||{}).filter(e=>e.done).length + Object.values(s.entries||{}).filter(e=>e.note||e.miles).length : -1;
-    const cands = [remote, embedded, local].filter(Boolean);
-    state = cands.sort((a,b)=>count(b)-count(a))[0] || state;
+    let embedded = null; try { embedded = JSON.parse(document.getElementById('state').textContent); } catch(_) {}
+    state = (count(local) >= count(embedded) ? local : embedded) || state;
     state.entries = state.entries||{}; state.wknotes = state.wknotes||{};
-    render();
-    try { const open = JSON.parse(sessionStorage.getItem('sub430-open')||'null'); if (open) { document.querySelectorAll('.week').forEach(w=>{ const n=w.querySelector('.wn').firstChild.textContent; w.classList.toggle('open', open.includes(n)); }); sessionStorage.removeItem('sub430-open'); } } catch(_) {}
-    try { artifact = (window.claude && claude.use) ? await claude.use('artifact') : null; } catch(_) { artifact = null; }
-    if (!artifact) { $('#saveMode').textContent = 'Saves in this browser. Use Copy log to move it.'; return; }
-    $('#saveMode').textContent = 'Entries save to this page and follow you across devices';
-    if (local && count(local) > Math.max(count(remote), count(embedded))) save();
+    render(); setMode();
+    const before = count(state);
+    await pull();
+    if (keyOf() && count(state) === before && before > 0) save();
   }
   load();
 })();
