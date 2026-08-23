@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sub 4</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sub 4">
+<meta name="theme-color" content="#0E1420">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --sky:#0E1420;--sky2:#16213A;--ground:#10171F;--road:#2A3140;--road-edge:#3C4556;--dash:#8B93A3;
+  --ink:#F2F3F0;--ink2:#B7BDC9;--mute:#7C8495;--card:#161C27;--line:#2A3242;
+  --accent:#F26B21;--accent2:#FFB067;--good:#5DD39E;--tree1:#1F5A3C;--tree2:#2C7A4E;--tree3:#3E9A5E;--trunk:#4A3526;
+  --tape:#FFFFFF;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.45;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.cond{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif}
+.num{font-variant-numeric:tabular-nums}
+
+/* START GATE */
+.gate{position:relative;padding:max(28px,env(safe-area-inset-top)) 20px 24px;max-width:920px;margin:0 auto;text-align:center}
+.gate .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent2);font-weight:700}
+.gate h1{margin:6px 0 0;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(84px,22vw,190px);line-height:.86;letter-spacing:-.02em;color:var(--ink)}
+.gate h1 span{color:var(--accent)}
+.gate .sub{font-size:15px;color:var(--ink2);margin-top:10px}
+.gate .sub b{color:var(--ink);font-weight:600}
+.dash{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;display:flex;gap:8px;align-items:baseline}
+.pill b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:24px;line-height:1}
+.pill span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.pill.hot{border-color:var(--accent);background:#2A1A10}
+.pill.hot b{color:var(--accent2)}
+.sync{margin-top:14px;font-size:12px;color:var(--mute)}
+.sync a{color:var(--accent2);text-decoration:none;border-bottom:1px dotted var(--accent2)}
+.arrow{margin-top:26px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.arrow:after{content:"";display:block;width:2px;height:42px;background:linear-gradient(var(--mute),transparent);margin:8px auto 0}
+
+/* ROAD */
+.world{position:relative;width:100%;}
+.world svg{display:block;width:100%;height:auto}
+.world .hud{position:absolute;inset:0;pointer-events:none}
+.sign{position:absolute;width:var(--cw);pointer-events:auto;transform:translateY(-50%)}
+.sign .post{position:absolute;top:50%;height:2px;background:var(--dash);width:var(--pw)}
+.sign.L .post{left:100%}
+.sign.R .post{right:100%}
+.sign .post:after{content:"";position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--dash);border:2px solid var(--sky)}
+.sign.L .post:after{right:-6px}.sign.R .post:after{left:-6px}
+.sign.done .post,.sign.done .post:after{background:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--accent2)}
+.sign.done .card{border-color:var(--accent)}
+.sign.today .card{border-color:var(--accent2);box-shadow:0 0 0 3px #2A1A10, 0 0 30px #F26B2155}
+.card .d{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700;display:flex;justify-content:space-between}
+.card .d i{font-style:normal;color:var(--accent2)}
+.card .m{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:34px;line-height:1;margin:2px 0 0}
+.card .m small{font-size:16px;font-weight:700;color:var(--ink2);margin-left:4px}
+.card .w{font-size:13px;color:var(--ink2);margin-top:2px}
+.card .w b{color:var(--ink);font-weight:600}
+.sign.done .card .m{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:3px;color:var(--ink2)}
+.card .chk{position:absolute;top:10px;right:12px;width:22px;height:22px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;font-size:13px;color:var(--sky);background:transparent}
+.sign.done .card .chk{background:var(--accent);border-color:var(--accent)}
+.log{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);gap:6px;grid-template-columns:1fr 1fr}
+.sign.open .log{display:grid}
+.log input,.log select,.log textarea{width:100%;font:inherit;font-size:14px;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--sky);color:var(--ink)}
+.log textarea{grid-column:1/-1;resize:vertical;min-height:40px}
+.log input:focus,.log select:focus,.log textarea:focus{outline:2px solid var(--accent);outline-offset:0}
+.log .row{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--mute)}
+.log button{font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink);background:var(--accent);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.sign.done .log button{background:var(--line);color:var(--ink2)}
+.marker{position:absolute;transform:translate(-50%,-50%);font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:13px;letter-spacing:.08em;background:var(--ground);border:2px solid var(--dash);color:var(--ink2);padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none}
+.marker b{color:var(--accent2);font-size:15px}
+.board{position:absolute;width:min(300px,44vw);background:#0B1018;border:2px solid var(--road-edge);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink2);pointer-events:auto;transform:translateY(-50%)}
+.board h4{margin:0 0 4px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--ink);letter-spacing:.04em}
+.board p{margin:0 0 4px}
+.board b{color:var(--ink)}
+
+/* runner */
+#runner .fB{display:none}
+body.moving #runner .fA{animation:strideA .26s steps(1) infinite}
+body.moving #runner .fB{display:block;animation:strideB .26s steps(1) infinite}
+body.moving #runner .speed{opacity:.8}
+@keyframes strideA{0%{visibility:visible}50%{visibility:hidden}100%{visibility:visible}}
+@keyframes strideB{0%{visibility:hidden}50%{visibility:visible}100%{visibility:hidden}}
+@media (prefers-reduced-motion: reduce){body.moving #runner .fA,body.moving #runner .fB{animation:none}body.moving #runner .fB{display:none}}
+
+/* FINISH */
+.finish{position:relative;max-width:920px;margin:-40px auto 0;padding:40px 20px 60px;text-align:center}
+.finish h2{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(56px,14vw,120px);line-height:.9;margin:0;letter-spacing:-.01em}
+.finish h2 span{color:var(--accent)}
+.finish .p{color:var(--ink2);font-size:15px;margin-top:8px}
+.result{margin:22px auto 0;display:inline-grid;grid-template-columns:auto auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.result input{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:38px;width:170px;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sky);color:var(--ink);text-align:center}
+.result input:focus{outline:2px solid var(--accent)}
+.result .v{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;color:var(--mute);text-align:left;max-width:200px;line-height:1}
+.result .v.yes{color:var(--good)}.result .v.no{color:var(--accent2)}
+.foot{margin-top:30px;font-size:12px;color:var(--mute);display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.foot button,.foot a{font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink2);background:none;border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer;text-decoration:none}
+.foot button:hover,.foot a:hover{border-color:var(--accent2);color:var(--ink)}
+.status{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--accent);border-radius:999px;padding:7px 14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.status.show{opacity:1}
+.status.warn{border-color:var(--accent2);color:var(--accent2)}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
+</style>
+</head>
+<body>
+<script id="state" type="application/json">{"entries":{},"wknotes":{},"finish":""}</script>
+
+<header class="gate">
+  <div class="eyebrow">TCS New York City Marathon · Nov 1, 2026</div>
+  <h1>SUB <span>4</span></h1>
+  <div class="sub"><b>9:09</b> a mile. <b>26.2</b> of them. Last time <b>4:47:10</b>. Fuck that.</div>
+  <div class="dash">
+    <div class="pill hot"><b class="num" id="days">—</b><span>days out</span></div>
+    <div class="pill"><b class="num"><span id="runsDone">0</span>/48</b><span>runs</span></div>
+    <div class="pill"><b class="num" id="milesDone">0</b><span>miles banked</span></div>
+    <div class="pill"><b class="num" id="avgPace">—</b><span>avg pace</span></div>
+  </div>
+  <div class="sync" id="saveMode">…</div>
+  <div class="arrow">Follow the road</div>
+</header>
+
+<div class="world" id="world">
+  <svg id="road" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+  <div class="hud" id="hud"></div>
+</div>
+
+<section class="finish">
+  <h2>FINISH <span>LINE</span></h2>
+  <div class="p">Central Park. Tavern on the Green. You know what you came for.</div>
+  <div class="result">
+    <input id="finish" class="num" placeholder="3:59:59" maxlength="8" aria-label="Finish time">
+    <div class="v" id="verdict">Type it when it's real.</div>
+  </div>
+  <div class="foot">
+    <button id="exportBtn" type="button">Copy log as text</button>
+    <a href="#" id="keyBtn">Sync key</a>
+  </div>
+</section>
+
+<div class="status" id="status"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+  const PLAN = [
+    {n:1, start:'2026-08-24', days:{tue:[4,'easy'],wed:[4,'easy'],thu:[5,'2 @ MP'],sat:[4,'easy'],sun:[12,'long']}},
+    {n:2, start:'2026-08-31', days:{tue:[4,'easy'],wed:[5,'easy'],thu:[6.2,'10K TIME TRIAL'],sat:[4,'easy'],sun:[14,'long']}, tag:'THE GATE'},
+    {n:3, start:'2026-09-07', days:{tue:[5,'easy'],wed:[5,'easy'],thu:[6,'4 @ MP'],sat:[4,'easy'],sun:[16,'long']}},
+    {n:4, start:'2026-09-14', days:{tue:[4,'easy'],wed:[4,'easy'],thu:[5,'easy'],sat:[4,'easy'],sun:[12,'long']}, tag:'REST WEEK'},
+    {n:5, start:'2026-09-21', days:{tue:[5,'easy'],wed:[5,'easy'],thu:[7,'5 @ MP'],sat:[4,'easy'],sun:[18,'last 5 @ MP']}},
+    {n:6, start:'2026-09-28', days:{tue:[5,'easy'],wed:[5,'easy'],thu:[6,'3 tempo @ 8:30'],sat:[4,'easy'],sun:[14,'long']}},
+    {n:7, start:'2026-10-05', days:{tue:[5,'easy'],wed:[5,'easy'],thu:[7,'5 @ MP'],sat:[4,'easy'],sun:[20,'last 6 @ MP']}, tag:'THE TEST'},
+    {n:8, start:'2026-10-12', days:{tue:[5,'easy'],wed:[5,'easy'],thu:[6,'4 @ MP'],sat:[4,'easy'],sun:[22,'last 6 @ MP']}, tag:'PEAK'},
+    {n:9, start:'2026-10-19', days:{tue:[4,'easy'],wed:[4,'easy'],thu:[5,'3 @ MP'],sat:[3,'easy'],sun:[12,'long']}},
+    {n:10,start:'2026-10-26', days:{tue:[4,'easy'],wed:[3,'easy + strides'],thu:[2,'easy'],sun:[26.2,'RACE']}, tag:'RACE WEEK'},
+  ];
+  const ORDER = ['tue','wed','thu','sat','sun'];
+  const DN = {tue:'Tue',wed:'Wed',thu:'Thu',sat:'Sat',sun:'Sun'};
+  const DOFF = {tue:1,wed:2,thu:3,sat:5,sun:6};
+  const WHY = {easy:'Slower than feels right. 10:30–11:00.', long:'10:15. Conversational. Finish wanting one more.', 'RACE':'9:30 on the bridge. 9:05 through Brooklyn. 9:00 on First Ave. Then whatever you have left.', '10K TIME TRIAL':'Race it. Under 52:00 and sub-4 is on.'};
+  const RACE = new Date('2026-11-01T09:00:00-05:00');
+  const $ = s => document.querySelector(s);
+  const SYNC = 'https://tools-sync.wadesellers.workers.dev/v1/sub430/log';
+  let state = {entries:{}, wknotes:{}, finish:''}, saveTimer = null;
+
+  // ---- runs list
+  const RUNS = [];
+  PLAN.forEach(w => ORDER.forEach(d => { const p = w.days[d]; if (!p) return; const dt = new Date(w.start+'T12:00:00'); dt.setDate(dt.getDate()+DOFF[d]); RUNS.push({k:'w'+w.n+'-'+d, w, d, mi:p[0], what:p[1], dt, iso:dt.toISOString().slice(0,10), first:d==='tue', race:p[1]==='RACE'}); }));
+  const todayIso = (()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')})();
+  function fmtDate(dt){ return (dt.getMonth()+1)+'/'+dt.getDate(); }
+  function fmt(n){ return Number.isInteger(n)? n : +n.toFixed(1); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function rnd(seed){ let s = seed; return () => { s = (s*9301+49297)%233280; return s/233280; }; }
+
+  // ---- build world
+  const svg = $('#road'), hud = $('#hud');
+  let W = 0, H = 0, roadPath, trailPath, runnerEl, total = 0, pts = [], cardW = 0, LUT = [];
+  function build(){
+    const vw = document.documentElement.clientWidth; W = Math.min(vw, 920);
+    const step = vw < 600 ? 230 : 250; H = RUNS.length*step + 520;
+    cardW = vw < 600 ? Math.min(225, vw*0.60) : 300;
+    const amp = vw < 600 ? vw*0.30 : W*0.24; const cx = vw/2;
+    // waypoints: alternate left/right, one per run
+    pts = RUNS.map((r,i) => ({x: cx + (i%2? amp : -amp) * (0.75 + 0.25*Math.sin(i*1.7)), y: 240 + i*step}));
+    const startP = {x:cx, y:120}, endP = {x:cx, y:H-120};
+    const all = [startP, ...pts, endP];
+    let d = `M ${all[0].x} ${all[0].y}`;
+    for (let i=1;i<all.length;i++){ const a=all[i-1], b=all[i]; const my=(a.y+b.y)/2; d += ` C ${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y}`; }
+    svg.setAttribute('viewBox', `0 0 ${vw} ${H}`); svg.setAttribute('width', vw); svg.setAttribute('height', H);
+    const R = rnd(42);
+    let trees = '';
+    // trees along the road, denser in easy weeks, none near the finish skyline
+    const probe = document.createElementNS('http://www.w3.org/2000/svg','path'); probe.setAttribute('d', d); svg.appendChild(probe);
+    const L = probe.getTotalLength();
+    for (let s=0; s<L-900; s+=22){
+      const p = probe.getPointAtLength(s), q = probe.getPointAtLength(Math.min(L,s+2));
+      const nx = -(q.y-p.y), ny = (q.x-p.x); const nl = Math.hypot(nx,ny)||1;
+      for (const side of [-1,1]){
+        if (R() > (vw < 600 ? 0.30 : 0.42)) continue;
+        const off = 70 + R()*140 + (vw<600? 0 : 40);
+        const tx = p.x + nx/nl*off*side, ty = p.y + ny/nl*off*side;
+        if (tx < 10 || tx > vw-10) continue;
+        const sz = 10 + R()*16; const c = ['var(--tree1)','var(--tree2)','var(--tree3)'][Math.floor(R()*3)];
+        if (R() < 0.7) trees += `<path d="M${tx} ${ty-sz*2} l${sz*0.8} ${sz*2} h${-sz*1.6} z" fill="${c}"/><rect x="${tx-2}" y="${ty}" width="4" height="${sz*0.5}" fill="var(--trunk)"/>`;
+        else trees += `<circle cx="${tx}" cy="${ty-sz}" r="${sz*0.9}" fill="${c}"/><rect x="${tx-2}" y="${ty-sz*0.2}" width="4" height="${sz*0.6}" fill="var(--trunk)"/>`;
+      }
+    }
+    probe.remove();
+    // skyline near the end
+    let sky = ''; { const baseY = H-330; let x = 0; const R2 = rnd(7); while (x < vw){ const w = 18+R2()*34, h = 40+R2()*150; sky += `<rect x="${x}" y="${baseY-h}" width="${w}" height="${h}" fill="#1B2436"/>`; for(let wy=baseY-h+8; wy<baseY-6; wy+=12){ for(let wx=x+4; wx<x+w-4; wx+=8){ if (R2()<0.35) sky += `<rect x="${wx}" y="${wy}" width="3" height="5" fill="#F2C66D" opacity=".8"/>`; } } x += w + 4 + R2()*10; } }
+    // finish tape + gate
+    const fy = endP.y; const tape = `<g><rect x="${cx-120}" y="${fy-70}" width="6" height="80" fill="#C9CED8"/><rect x="${cx+114}" y="${fy-70}" width="6" height="80" fill="#C9CED8"/>` +
+      Array.from({length:24},(_,i)=>`<rect x="${cx-120+i*10}" y="${fy-70}" width="10" height="10" fill="${i%2?'#fff':'#111'}"/><rect x="${cx-120+i*10}" y="${fy-60}" width="10" height="10" fill="${i%2?'#111':'#fff'}"/>`).join('') +
+      `<text x="${cx}" y="${fy-82}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="34" fill="var(--accent)">FINISH</text></g>`;
+    // Verrazzano bridge at race start: between last training run and race
+    const rIdx = RUNS.findIndex(r=>r.race); const bp = pts[rIdx], ap = pts[rIdx-1]; const by = ap.y + (bp.y-ap.y)*0.74;
+    const bridge = `<g opacity=".9"><rect x="${Math.min(ap.x,bp.x)-40}" y="${by-8}" width="${Math.abs(ap.x-bp.x)+80}" height="16" fill="#3C4556"/><path d="M${Math.min(ap.x,bp.x)-40} ${by-8} Q ${(ap.x+bp.x)/2} ${by-110} ${Math.max(ap.x,bp.x)+40} ${by-8}" stroke="#8B93A3" stroke-width="4" fill="none"/>${Array.from({length:9},(_,i)=>{const x=Math.min(ap.x,bp.x)-40+i*(Math.abs(ap.x-bp.x)+80)/8; return `<line x1="${x}" y1="${by-8}" x2="${x}" y2="${by-60}" stroke="#8B93A3" stroke-width="2"/>`}).join('')}<text x="${(ap.x+bp.x)/2}" y="${by-118}" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="14" fill="var(--ink2)" letter-spacing="2">VERRAZZANO</text></g>`;
+    // water under bridge
+    const water = `<rect x="0" y="${by-4}" width="${vw}" height="60" fill="#0F2235" opacity=".8"/>`;
+    svg.innerHTML = `
+      <rect x="0" y="0" width="${vw}" height="${H}" fill="var(--ground)"/>
+      ${sky}${water}
+      <g>${trees}</g>
+      <path d="${d}" stroke="var(--road-edge)" stroke-width="46" fill="none" stroke-linecap="round"/>
+      <path id="roadP" d="${d}" stroke="var(--road)" stroke-width="38" fill="none" stroke-linecap="round"/>
+      <path d="${d}" stroke="var(--dash)" stroke-width="3" fill="none" stroke-dasharray="18 22" opacity=".7"/>
+      <path id="trailP" d="${d}" stroke="var(--accent)" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="0 999999" opacity=".95"/>
+      ${bridge}${tape}
+      <g id="runner" transform="translate(${cx},120)">
+        <g id="runnerBody" transform="scale(1.5)">
+          <ellipse cx="0" cy="2" rx="13" ry="3" fill="#000" opacity=".4"/>
+          <g class="speed" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" opacity="0">
+            <line x1="-16" y1="-30" x2="-30" y2="-30"/><line x1="-14" y1="-22" x2="-34" y2="-22"/><line x1="-18" y1="-14" x2="-28" y2="-14"/>
+          </g>
+          <g class="fr fA" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M-2 -18 L-12 -9 L-19 -1" stroke="var(--accent2)" stroke-width="5"/>
+            <path d="M-2 -18 L9 -13 L7 -3" stroke="var(--accent2)" stroke-width="5"/>
+            <path d="M3 -33 L-6 -26 L-13 -31" stroke="var(--accent2)" stroke-width="4.5"/>
+            <path d="M4 -35 L-2 -18" stroke="var(--accent)" stroke-width="8"/>
+            <path d="M3 -33 L12 -28 L17 -36" stroke="var(--accent2)" stroke-width="4.5"/>
+            <circle cx="7" cy="-41" r="5.5" fill="var(--accent2)" stroke="none"/>
+          </g>
+          <g class="fr fB" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M-2 -18 L-7 -11 L-4 -2" stroke="var(--accent2)" stroke-width="5"/>
+            <path d="M-2 -18 L12 -19 L21 -8" stroke="var(--accent2)" stroke-width="5"/>
+            <path d="M3 -33 L10 -26 L6 -18" stroke="var(--accent2)" stroke-width="4.5"/>
+            <path d="M4 -35 L-2 -18" stroke="var(--accent)" stroke-width="8"/>
+            <path d="M3 -33 L-8 -28 L-14 -20" stroke="var(--accent2)" stroke-width="4.5"/>
+            <circle cx="7" cy="-41" r="5.5" fill="var(--accent2)" stroke="none"/>
+          </g>
+        </g>
+      </g>`;
+    roadPath = $('#roadP'); trailPath = $('#trailP'); runnerEl = $('#runner'); total = roadPath.getTotalLength();
+    // precompute path length at each run point
+    RUNS.forEach((r,i) => { r.p = pts[i]; r.len = 0; r._bd = 1e9; });
+    LUT = []; const STEP = 5;
+    for (let s=0, j=0; s<=total; s+=STEP){ const q = roadPath.getPointAtLength(s); LUT.push(q.x, q.y); if (j < RUNS.length){ const r = RUNS[j]; const dd = Math.hypot(q.x-r.p.x, q.y-r.p.y); if (dd < r._bd){ r._bd = dd; r.len = s; } else if (q.y > r.p.y + 40){ j++; } } }
+    LUT.step = STEP;
+    renderHud();
+  }
+
+  function renderHud(){
+    const vw = document.documentElement.clientWidth, cx = vw/2;
+    let html = '';
+    // start marker + rules board
+    html += `<div class="marker" style="left:${cx}px;top:${30}px"><b>START</b> · 8/24</div>`;
+    html += `<div class="board" style="left:${Math.max(12, cx - 320 - 0)}px;top:${150}px;display:${vw<700?'none':'block'}"><h4>Road rules</h4><p><b>Sunday is the plan.</b> Never skip, never double.</p><p><b>Easy means easy.</b></p><p><b>Pain that changes your stride ends the run.</b></p><p><b>Gel every 45 min</b> on the 20 and 22.</p></div>`;
+    RUNS.forEach((r,i) => {
+      const p = r.p; const e = state.entries[r.k]||{}; const left = p.x > cx; // card on the opposite side of the bend
+      const pw = Math.max(26, Math.abs(p.x - (left ? p.x - 36 : p.x + 36)) + 6);
+      const cardLeft = left ? p.x - 34 - pw - cardW : p.x + 34 + pw;
+      const side = left ? 'L' : 'R';
+      const today = r.iso === todayIso;
+      const why = r.what in WHY ? WHY[r.what] : (r.what.includes('MP') ? 'MP = 9:05. Warm up, then hit it. Rest easy.' : r.what.includes('tempo') ? 'Comfortably hard. 8:30. Not a race.' : '');
+      html += `<div class="sign ${side}${e.done?' done':''}${today?' today':''}" data-k="${r.k}" style="left:${Math.max(8,Math.min(vw-cardW-8,cardLeft))}px;top:${p.y}px;--cw:${cardW}px;--pw:${pw}px">
+        <div class="post"></div>
+        <div class="card" role="button" tabindex="0">
+          <div class="d"><span>${r.race?'SUNDAY · RACE DAY':'week '+r.w.n+' · '+DN[r.d]+' '+fmtDate(r.dt)}</span>${today?'<i>today</i>':''}</div>
+          <div class="m">${r.race?'26.2':r.mi}<small>${r.race?'THE RACE':r.what}</small></div>
+          ${why?`<div class="w">${why}</div>`:''}
+          <div class="chk">✓</div>
+          <div class="log">
+            <input inputmode="decimal" placeholder="miles (${r.mi})" value="${esc(e.miles||'')}" data-f="miles" aria-label="Miles">
+            <input placeholder="pace 9:05" value="${esc(e.pace||'')}" data-f="pace" aria-label="Pace">
+            <textarea placeholder="how'd it go" data-f="note">${esc(e.note||'')}</textarea>
+            <div class="row"><select data-f="felt" aria-label="Felt"><option value="">felt…</option>${[1,2,3,4,5].map(n=>`<option ${e.felt==n?'selected':''} value="${n}">${['','rough','meh','fine','good','strong'][n]}</option>`).join('')}</select><button type="button" data-f="done">${e.done?'undo':'done ✓'}</button></div>
+          </div>
+        </div>
+      </div>`;
+      if (r.first) html += `<div class="marker" style="left:${cx}px;top:${p.y-120}px">WEEK <b>${r.w.n}</b>${r.w.tag?' · '+r.w.tag:''}</div>`;
+    });
+    // race pacing board before the bridge
+    const rIdx = RUNS.findIndex(r=>r.race); const rp = RUNS[rIdx].p;
+    html += `<div class="board" style="left:${rp.x > cx ? 12 : vw - Math.min(300,vw*0.44) - 12}px;top:${rp.y+300}px"><h4>Race plan</h4><p><b>1–3</b> 9:30. Bridge. Let them go.</p><p><b>4–14</b> 9:05. Half at 1:59.</p><p><b>15–16</b> 9:30. Queensboro. No watch.</p><p><b>17–23</b> 9:00. First Ave. The race.</p><p><b>24–26.2</b> Hold. Fifth Ave is a hill.</p><p>Gel 45/90/135/180/225.</p></div>`;
+    hud.innerHTML = html;
+    worldTop = $('#world').getBoundingClientRect().top + window.scrollY;
+    updateTrail(); renderStats(); onScroll();
+  }
+
+  function updateTrail(){
+    let last = -1; RUNS.forEach((r,i) => { if ((state.entries[r.k]||{}).done) last = i; });
+    const len = last < 0 ? 0 : RUNS[last].len;
+    trailPath.setAttribute('stroke-dasharray', `${len} 999999`);
+  }
+  function renderStats(){
+    let runs=0, miles=0, paces=[];
+    RUNS.forEach(r => { const e = state.entries[r.k]; if (!e||!e.done||r.race) return; runs++; miles += parseFloat(e.miles)||r.mi; const s = parsePace(e.pace); if (s) paces.push(s); });
+    $('#runsDone').textContent = runs; $('#milesDone').textContent = fmt(miles);
+    $('#avgPace').textContent = paces.length ? fmtPace(paces.reduce((a,b)=>a+b,0)/paces.length) : '—';
+    const d = Math.ceil((RACE - new Date())/86400000); $('#days').textContent = d>0? d : (d===0?'GO':'done');
+    $('#finish').value = state.finish||''; verdict(false);
+  }
+  function verdict(celebrate){
+    const s = parseTime(state.finish); const v = $('#verdict'); v.className='v';
+    if (!s) { v.textContent="Type it when it's real."; return; }
+    if (s < 4*3600) { v.textContent='SUB 4. HOLY SHIT.'; v.classList.add('yes'); if (celebrate) confetti(); }
+    else if (s < 4*3600+15*60) { v.textContent='Sub 4:15. Massive PR.'; v.classList.add('yes'); if (celebrate) confetti(); }
+    else if (s < 4*3600+47*60+10) { v.textContent='A PR. Not the one. Next year.'; v.classList.add('no'); }
+    else { v.textContent='Next year, motherfucker.'; v.classList.add('no'); }
+  }
+  function parsePace(p){ if(!p) return 0; const m = String(p).trim().match(/^(\d{1,2})[:.](\d{2})$/); return m? (+m[1])*60+(+m[2]) : 0; }
+  function parseTime(t){ if(!t) return 0; const m = String(t).trim().match(/^(\d):(\d{2}):(\d{2})$/); return m? (+m[1])*3600+(+m[2])*60+(+m[3]) : 0; }
+  function fmtPace(s){ return Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0'); }
+
+  // ---- scroll → runner
+  let moveT = null, lastY = -1, ticking = false, worldTop = 0;
+  function lutPoint(L){ const i = Math.max(0, Math.min(LUT.length/2 - 1, Math.round(L / LUT.step))); return {x: LUT[i*2], y: LUT[i*2+1]}; }
+  function onScroll(){
+    if (!roadPath || !LUT.length) return;
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const focus = window.scrollY + window.innerHeight*0.45 - worldTop;
+      const frac = Math.max(0, Math.min(1, focus / H));
+      const L = frac * total;
+      const p = lutPoint(L), q = lutPoint(Math.min(total, L + 12));
+      const dir = (q.x - p.x) < -0.3 ? -1 : 1;
+      runnerEl.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+      $('#runnerBody').setAttribute('transform', `scale(${1.5*dir},1.5)`);
+      if (window.scrollY !== lastY) { document.body.classList.add('moving'); clearTimeout(moveT); moveT = setTimeout(()=>document.body.classList.remove('moving'), 180); lastY = window.scrollY; }
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(build, 150); });
+
+  // ---- events
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-f=done]');
+    if (btn) { const k = btn.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en.done = !en.done; save(); renderHud(); const s = document.querySelector(`.sign[data-k="${k}"]`); if (s && en.done===false) s.classList.add('open'); if (en.done) flash('Banked.'); return; }
+    if (e.target.closest('.log')) return;
+    const card = e.target.closest('.card');
+    if (card) { card.parentElement.classList.toggle('open'); return; }
+    if (e.target.id==='keyBtn') { e.preventDefault(); const k = prompt('Sync key:', keyOf()); if (k===null) return; localStorage.setItem('tools-sync-key', k.trim()); setMode(); if (k.trim()) pull().then(save); }
+  });
+  document.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('card')) { e.preventDefault(); e.target.click(); } });
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.f && t.dataset.f!=='done') { const k = t.closest('.sign').dataset.k; const en = state.entries[k] = state.entries[k]||{}; en[t.dataset.f] = t.value; save(); if (t.dataset.f==='miles'||t.dataset.f==='pace') renderStats(); }
+    else if (t.id==='finish') { state.finish = t.value; verdict(true); save(); }
+  });
+  $('#exportBtn').addEventListener('click', async () => {
+    const lines = ['SUB 4 · NYC Marathon 11/1/26']; let cw = 0;
+    RUNS.forEach(r => { const e = state.entries[r.k]; if (!e||!e.done) return; if (r.w.n!==cw){ cw=r.w.n; lines.push('', 'Week '+cw); } lines.push('  '+DN[r.d]+' '+fmtDate(r.dt)+': '+(e.miles||r.mi)+' mi'+(e.pace?' @ '+e.pace:'')+(e.felt?' · felt '+e.felt+'/5':'')+(e.note?' · '+e.note:'')); });
+    if (state.finish) lines.push('', 'Finish: '+state.finish);
+    try { await navigator.clipboard.writeText(lines.join('\n')); flash('Copied'); } catch(_) { flash('Could not copy', true); }
+  });
+
+  // ---- confetti
+  function confetti(){
+    const c = $('#confetti'), ctx = c.getContext('2d'); c.width = innerWidth; c.height = innerHeight;
+    const ps = Array.from({length:220},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*0.5,vx:(Math.random()-0.5)*3,vy:2+Math.random()*4,r:4+Math.random()*6,a:Math.random()*6,col:['#F26B21','#FFB067','#5DD39E','#FFFFFF','#F2C66D'][Math.floor(Math.random()*5)]}));
+    let t=0; (function frame(){ ctx.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=0.1;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.col;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);ctx.restore();}); if (++t<260) requestAnimationFrame(frame); else ctx.clearRect(0,0,c.width,c.height); })();
+  }
+
+  // ---- persistence
+  const keyOf = () => localStorage.getItem('tools-sync-key') || '';
+  const count = s => s ? Object.values(s.entries||{}).filter(e=>e.done||e.note||e.miles).length + (s.finish?1:0) : -1;
+  function flash(msg, warn){ const s = $('#status'); s.textContent = msg; s.className = 'status show'+(warn?' warn':''); clearTimeout(s._t); s._t = setTimeout(()=>s.className='status', 1600); }
+  function setMode(){ $('#saveMode').innerHTML = keyOf() ? 'Synced across your devices' : 'Saves in this browser only · <a href="#" id="keyBtn2">connect sync</a>'; const b = $('#keyBtn2'); if (b) b.onclick = e => { e.preventDefault(); $('#keyBtn').click(); }; }
+  function save(){
+    localStorage.setItem('sub430', JSON.stringify(state));
+    if (!keyOf()) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try { const r = await fetch(SYNC, {method:'PUT', headers:{'Content-Type':'application/json','X-Sync-Key':keyOf()}, body: JSON.stringify(state)}); if (r.status===401) { flash('Sync key rejected', true); return; } if (!r.ok) throw 0; }
+      catch(_) { flash('Offline, kept here', true); }
+    }, 1500);
+  }
+  async function pull(){
+    if (!keyOf()) return;
+    try { const r = await fetch(SYNC, {headers:{'X-Sync-Key':keyOf()}, cache:'no-store'}); if (r.status===401) { flash('Sync key rejected', true); return; } if (r.status===404) return; const remote = await r.json(); if (remote && count(remote) >= count(state)) { state = remote; state.entries = state.entries||{}; } }
+    catch(_) { flash('Offline, showing local', true); }
+  }
+  async function load(){
+    let local = null; try { local = JSON.parse(localStorage.getItem('sub430')||'null'); } catch(_) {}
+    if (local) state = local; state.entries = state.entries||{};
+    build(); setMode();
+    const before = count(state); await pull(); renderHud();
+    if (keyOf() && count(state) === before && before > 0) save();
+    // scroll to today's run on first load
+    const t = document.querySelector('.sign.today'); if (t && window.scrollY < 10) setTimeout(()=>{ window.scrollTo({top: t.offsetTop + $('#world').offsetTop - innerHeight*0.45, behavior:'smooth'}); }, 400);
+  }
+  document.fonts && document.fonts.ready.then(()=>{}); load();
+})();
+</script>
+</body>
+</html>
