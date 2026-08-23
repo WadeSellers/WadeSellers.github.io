@@ -82,13 +82,17 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:Barlow,"Helveti
 .board b{color:var(--ink)}
 
 /* runner */
-#runner .fB{display:none}
-body.moving #runner .fA{animation:strideA .26s steps(1) infinite}
-body.moving #runner .fB{display:block;animation:strideB .26s steps(1) infinite}
-body.moving #runner .speed{opacity:.8}
-@keyframes strideA{0%{visibility:visible}50%{visibility:hidden}100%{visibility:visible}}
-@keyframes strideB{0%{visibility:hidden}50%{visibility:visible}100%{visibility:hidden}}
-@media (prefers-reduced-motion: reduce){body.moving #runner .fA,body.moving #runner .fB{animation:none}body.moving #runner .fB{display:none}}
+#runnerH{position:absolute;left:0;top:0;width:0;height:0;will-change:transform;pointer-events:none;z-index:2}
+#runnerH svg{position:absolute;left:-60px;top:-112px;width:120px;height:120px;overflow:visible}
+#runnerH .f{display:none}
+#runnerH .f0{display:block}
+body.moving #runnerH .f0{animation:rc .44s steps(1) infinite}
+body.moving #runnerH .f1{display:block;animation:rc .44s steps(1) infinite;animation-delay:-.33s}
+body.moving #runnerH .f2{display:block;animation:rc .44s steps(1) infinite;animation-delay:-.22s}
+body.moving #runnerH .f3{display:block;animation:rc .44s steps(1) infinite;animation-delay:-.11s}
+body.moving #runnerH .speed{opacity:.9}
+@keyframes rc{0%{visibility:visible}25%{visibility:hidden}100%{visibility:hidden}}
+@media (prefers-reduced-motion: reduce){body.moving #runnerH .f{animation:none;display:none}body.moving #runnerH .f0{display:block}}
 
 /* FINISH */
 .finish{position:relative;max-width:920px;margin:-40px auto 0;padding:40px 20px 60px;text-align:center}
@@ -129,6 +133,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
 <div class="world" id="world">
   <svg id="road" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
   <div class="hud" id="hud"></div>
+  <div id="runnerH" aria-hidden="true"></div>
 </div>
 
 <section class="finish">
@@ -233,31 +238,8 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
       <path d="${d}" stroke="var(--dash)" stroke-width="3" fill="none" stroke-dasharray="18 22" opacity=".7"/>
       <path id="trailP" d="${d}" stroke="var(--accent)" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="0 999999" opacity=".95"/>
       ${bridge}${tape}
-      <g id="runner" transform="translate(${cx},120)">
-        <g id="runnerBody" transform="scale(1.5)">
-          <ellipse cx="0" cy="2" rx="13" ry="3" fill="#000" opacity=".4"/>
-          <g class="speed" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" opacity="0">
-            <line x1="-16" y1="-30" x2="-30" y2="-30"/><line x1="-14" y1="-22" x2="-34" y2="-22"/><line x1="-18" y1="-14" x2="-28" y2="-14"/>
-          </g>
-          <g class="fr fA" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M-2 -18 L-12 -9 L-19 -1" stroke="var(--accent2)" stroke-width="5"/>
-            <path d="M-2 -18 L9 -13 L7 -3" stroke="var(--accent2)" stroke-width="5"/>
-            <path d="M3 -33 L-6 -26 L-13 -31" stroke="var(--accent2)" stroke-width="4.5"/>
-            <path d="M4 -35 L-2 -18" stroke="var(--accent)" stroke-width="8"/>
-            <path d="M3 -33 L12 -28 L17 -36" stroke="var(--accent2)" stroke-width="4.5"/>
-            <circle cx="7" cy="-41" r="5.5" fill="var(--accent2)" stroke="none"/>
-          </g>
-          <g class="fr fB" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M-2 -18 L-7 -11 L-4 -2" stroke="var(--accent2)" stroke-width="5"/>
-            <path d="M-2 -18 L12 -19 L21 -8" stroke="var(--accent2)" stroke-width="5"/>
-            <path d="M3 -33 L10 -26 L6 -18" stroke="var(--accent2)" stroke-width="4.5"/>
-            <path d="M4 -35 L-2 -18" stroke="var(--accent)" stroke-width="8"/>
-            <path d="M3 -33 L-8 -28 L-14 -20" stroke="var(--accent2)" stroke-width="4.5"/>
-            <circle cx="7" cy="-41" r="5.5" fill="var(--accent2)" stroke="none"/>
-          </g>
-        </g>
-      </g>`;
-    roadPath = $('#roadP'); trailPath = $('#trailP'); runnerEl = $('#runner'); total = roadPath.getTotalLength();
+      `;
+    roadPath = $('#roadP'); trailPath = $('#trailP'); runnerEl = $('#runnerH'); runnerEl.innerHTML = runnerSVG(); total = roadPath.getTotalLength();
     // precompute path length at each run point
     RUNS.forEach((r,i) => { r.p = pts[i]; r.len = 0; r._bd = 1e9; });
     LUT = []; const STEP = 5;
@@ -329,6 +311,38 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
   function parseTime(t){ if(!t) return 0; const m = String(t).trim().match(/^(\d):(\d{2}):(\d{2})$/); return m? (+m[1])*3600+(+m[2])*60+(+m[3]) : 0; }
   function fmtPace(s){ return Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0'); }
 
+
+  // ---- runner character (4-frame run cycle, generated)
+  function runnerSVG(){
+    const SKIN='#F2B68C', SKIN2='#D9935F', SING='#F26B21', SING2='#C9551A', SHORT='#1B2233', SHOE='#F4F4F2', SOLE='#F26B21', CAP='#111722';
+    const d2r = a => a*Math.PI/180;
+    const limb = (hx,hy,a1,l1,bend,l2) => { const kx=hx+l1*Math.sin(d2r(a1)), ky=hy+l1*Math.cos(d2r(a1)); const a2=a1+bend; const fx=kx+l2*Math.sin(d2r(a2)), fy=ky+l2*Math.cos(d2r(a2)); return {kx,ky,fx,fy,a2}; };
+    const HIP = [0,-46], SH = [4,-72];
+    const leg = (a1,bend,front) => {
+      const L=limb(HIP[0],HIP[1],a1,22,-bend,21);
+      const tx=Math.cos(d2r(L.a2)), ty=-Math.sin(d2r(L.a2));
+      const sx=L.fx-tx*4, sy=L.fy-ty*4, ex=L.fx+tx*11, ey=L.fy+ty*11;
+      const nx=-ty, ny=tx;
+      return `<path d="M${HIP[0]} ${HIP[1]} L${L.kx} ${L.ky} L${L.fx} ${L.fy}" stroke="${front?SKIN:SKIN2}" stroke-width="10" fill="none"/>`+
+             `<path d="M${sx} ${sy} L${ex} ${ey}" stroke="${SHOE}" stroke-width="9" fill="none"/>`+
+             `<path d="M${sx+nx*4} ${sy+ny*4} L${ex+nx*4} ${ey+ny*4}" stroke="${SOLE}" stroke-width="3" fill="none"/>`;
+    };
+    const arm = (a1,front) => { const sx = front? SH[0]+2 : SH[0]-7, sy = front? SH[1] : SH[1]+2; const A=limb(sx,sy,a1*1.4,18,100,17); return `<path d="M${sx} ${sy} L${A.kx} ${A.ky} L${A.fx} ${A.fy}" stroke="${front?SKIN:SKIN2}" stroke-width="8" fill="none"/><circle cx="${A.fx}" cy="${A.fy}" r="4.6" fill="${front?SKIN:SKIN2}"/>`; };
+    // frames: [backThigh, backBend, frontThigh, frontBend] angles from straight-down, + = forward
+    const F = [[-40,85,45,75],[-15,30,20,10],[45,75,-40,85],[20,10,-15,30]];
+    const body = `<path d="M${SH[0]} ${SH[1]-2} L${HIP[0]} ${HIP[1]+2}" stroke="${SING}" stroke-width="20"/><path d="M${SH[0]-2} ${SH[1]+6} L${HIP[0]-1} ${HIP[1]}" stroke="${SING2}" stroke-width="4" opacity=".6"/><path d="M0 -48 L0 -37" stroke="${SHORT}" stroke-width="22"/><text x="2" y="-55" text-anchor="middle" font-family="Barlow Condensed, Impact, sans-serif" font-weight="800" font-size="12" fill="#fff">4</text>`;
+    const head = `<path d="M${SH[0]+1} ${SH[1]-2} L${SH[0]+5} ${SH[1]-9}" stroke="${SKIN}" stroke-width="7"/><circle cx="11" cy="-88" r="10" fill="${SKIN}"/><path d="M1 -91 A10 10 0 0 1 21 -91 L24 -91 L23 -88 L1 -88 Z" fill="${CAP}"/><path d="M20 -89.5 l10 0 l-1 3 l-9 0 z" fill="${CAP}"/><circle cx="17" cy="-85" r="1.6" fill="#2B1D14"/>`;
+    const shadow = `<ellipse cx="0" cy="2" rx="17" ry="4" fill="#000" opacity=".45"/>`;
+    const speed = `<g class="speed" stroke="#FFB067" stroke-width="2.5" stroke-linecap="round" opacity="0"><line x1="-24" y1="-78" x2="-42" y2="-78"/><line x1="-22" y1="-64" x2="-50" y2="-64"/><line x1="-26" y1="-50" x2="-40" y2="-50"/></g>`;
+    let out = `<svg viewBox="-60 -112 120 120" xmlns="http://www.w3.org/2000/svg">${shadow}${speed}`;
+    F.forEach((f,i) => {
+      const bob = [0,3,0,3][i];
+      out += `<g class="f f${i}" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,${bob}) rotate(10)">` +
+        arm(-f[2], false) + leg(f[0], f[1], false) + body + leg(f[2], f[3], true) + arm(-f[0], true) + head + `</g>`;
+    });
+    return out + `</svg>`;
+  }
+
   // ---- scroll → runner
   let moveT = null, lastY = -1, ticking = false, worldTop = 0;
   function lutPoint(L){ const i = Math.max(0, Math.min(LUT.length/2 - 1, Math.round(L / LUT.step))); return {x: LUT[i*2], y: LUT[i*2+1]}; }
@@ -342,8 +356,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
       const L = frac * total;
       const p = lutPoint(L), q = lutPoint(Math.min(total, L + 12));
       const dir = (q.x - p.x) < -0.3 ? -1 : 1;
-      runnerEl.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)})`);
-      $('#runnerBody').setAttribute('transform', `scale(${1.5*dir},1.5)`);
+      runnerEl.style.transform = `translate3d(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px,0) scaleX(${dir})`;
       if (window.scrollY !== lastY) { document.body.classList.add('moving'); clearTimeout(moveT); moveT = setTimeout(()=>document.body.classList.remove('moving'), 180); lastY = window.scrollY; }
     });
   }
