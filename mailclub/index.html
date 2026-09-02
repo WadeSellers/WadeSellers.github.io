@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Mail Club</title>
+<style>
+  :root { --bg:#0f0f11; --card:#1a1a1f; --line:#2a2a31; --fg:#ececf1; --mute:#8a8a96; --ok:#3ddc84; --yes:#ffcc4d; --skip:#7a7a86; --acc:#5b9dff; --bad:#ff5b6e; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; -webkit-text-size-adjust:100%; }
+  a { color:var(--acc); }
+  header { position:sticky; top:0; z-index:5; background:rgba(15,15,17,.96); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:calc(10px + env(safe-area-inset-top)) 14px 10px; }
+  h1 { font-size:18px; margin:0 0 6px; display:flex; justify-content:space-between; align-items:baseline; }
+  h1 small { font-weight:400; color:var(--mute); font-size:13px; }
+  .bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; margin:6px 0; }
+  .bar i { display:block; height:100%; background:var(--ok); width:0; transition:width .3s; }
+  .stats { display:flex; gap:14px; font-size:13px; color:var(--mute); flex-wrap:wrap; }
+  .stats b { color:var(--fg); }
+  .stats .warn { color:var(--yes); }
+  .ctl { display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap; }
+  .tabs { display:flex; gap:4px; background:var(--card); border-radius:10px; padding:3px; }
+  .tabs button { background:none; border:0; color:var(--mute); padding:6px 10px; border-radius:8px; font-size:13px; cursor:pointer; }
+  .tabs button.on { background:var(--line); color:var(--fg); }
+  input[type=search] { flex:1; min-width:120px; background:var(--card); border:1px solid var(--line); color:var(--fg); border-radius:10px; padding:8px 10px; font-size:15px; }
+  select { background:var(--card); border:1px solid var(--line); color:var(--fg); border-radius:10px; padding:7px 8px; font-size:13px; }
+  main { padding:8px 10px calc(60px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
+  .row { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px 10px; margin:6px 0; }
+  .row.sent { border-color:#1f4a33; }
+  .row.yes { border-color:#5a4a1a; }
+  .row.skip { opacity:.5; }
+  .who { flex:1; min-width:0; }
+  .who a { display:block; font-weight:600; text-decoration:none; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .who .m { font-size:12px; color:var(--mute); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .b { border:1px solid var(--line); background:none; color:var(--mute); border-radius:8px; padding:7px 9px; font-size:13px; cursor:pointer; min-width:44px; }
+  .b.on-sent { background:var(--ok); border-color:var(--ok); color:#062; font-weight:700; }
+  .b.on-yes { background:var(--yes); border-color:var(--yes); color:#4a3600; font-weight:700; }
+  .b.on-skip { background:var(--skip); border-color:var(--skip); color:#111; }
+  .note { width:100%; background:transparent; border:0; border-top:1px dashed var(--line); color:var(--fg); font-size:13px; padding:6px 0 0; margin-top:6px; outline:none; }
+  .empty { color:var(--mute); text-align:center; padding:40px 10px; }
+  .more { display:block; width:100%; background:var(--card); border:1px solid var(--line); color:var(--fg); padding:12px; border-radius:12px; margin:10px 0; font-size:15px; cursor:pointer; }
+  footer { position:fixed; left:0; right:0; bottom:0; padding:8px 14px calc(8px + env(safe-area-inset-bottom)); background:rgba(15,15,17,.96); border-top:1px solid var(--line); font-size:12px; color:var(--mute); display:flex; justify-content:space-between; }
+  #flash { position:fixed; top:12px; left:50%; transform:translateX(-50%); background:var(--fg); color:var(--bg); padding:6px 12px; border-radius:8px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:9; }
+  #flash.bad { background:var(--bad); color:#fff; }
+  #flash.show { opacity:1; }
+  .gate { padding:60px 20px; text-align:center; color:var(--mute); }
+  .gate button { background:var(--acc); color:#fff; border:0; border-radius:10px; padding:12px 18px; font-size:16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mail Club <small id="sub">1,680 followers</small></h1>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="stats">
+    <span><b id="nSent">0</b> asked</span>
+    <span><b id="nYes">0</b> yes</span>
+    <span><b id="nSkip">0</b> skipped</span>
+    <span><b id="nLeft">0</b> to go</span>
+    <span id="today"><b id="nToday">0</b> today</span>
+  </div>
+  <div class="ctl">
+    <div class="tabs" id="tabs">
+      <button data-v="todo" class="on">Next up</button>
+      <button data-v="sent">Asked</button>
+      <button data-v="yes">Yes</button>
+      <button data-v="skip">Skipped</button>
+      <button data-v="all">All</button>
+    </div>
+    <select id="sort" title="Order">
+      <option value="new">Newest followers first</option>
+      <option value="old">Oldest first</option>
+      <option value="az">A → Z</option>
+    </select>
+  </div>
+  <div class="ctl" style="margin-top:8px"><input type="search" id="q" placeholder="Find a username (to log a reply)…" autocomplete="off" autocapitalize="none"></div>
+</header>
+<main id="list"></main>
+<footer><span id="sync"></span><span id="cnt"></span></footer>
+<div id="flash"></div>
+<script>
+(() => {
+  const BASE = 'https://tools-sync.wadesellers.workers.dev/v1/mailclub/';
+  const $ = s => document.querySelector(s);
+  const keyOf = () => localStorage.getItem('tools-sync-key') || '';
+  const PAGE = 40;            // rows shown per "page" of the list
+  const DAILY_SOFT_CAP = 40;  // Instagram gets twitchy above this for cold DMs
+  let followers = [], marks = {}, view = 'todo', shown = PAGE, saveTimer = null, flashTimer = null;
+
+  const flash = (m, bad) => { const f = $('#flash'); f.textContent = m; f.className = bad ? 'bad show' : 'show'; clearTimeout(flashTimer); flashTimer = setTimeout(() => f.className = '', 1800); };
+  const today = () => new Date().toISOString().slice(0, 10);
+  const day = ts => ts ? new Date(ts).toISOString().slice(0, 10) : '';
+  const hdr = () => ({ 'Content-Type': 'application/json', 'X-Sync-Key': keyOf() });
+
+  // ---- sync ----
+  function setMode() {
+    $('#sync').innerHTML = keyOf() ? 'synced · <a href="#" id="keyBtn">key</a>' : 'not connected · <a href="#" id="keyBtn">connect sync</a>';
+    $('#keyBtn').onclick = e => { e.preventDefault(); askKey(); };
+  }
+  function askKey() {
+    const k = prompt('Sync key:', keyOf()); if (k === null) return;
+    localStorage.setItem('tools-sync-key', k.trim()); setMode(); boot();
+  }
+  function saveLocal() { localStorage.setItem('mailclub', JSON.stringify(marks)); }
+  function save() {
+    saveLocal(); if (!keyOf()) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        // merge-then-put so two devices never clobber each other
+        const r = await fetch(BASE + 'state', { headers: hdr(), cache: 'no-store' });
+        if (r.status === 401) { flash('Sync key rejected', true); return; }
+        if (r.ok) merge(await r.json());
+        const p = await fetch(BASE + 'state', { method: 'PUT', headers: hdr(), body: JSON.stringify(marks) });
+        if (!p.ok) throw 0;
+        saveLocal(); render();
+      } catch (_) { flash('Offline, kept here', true); }
+    }, 1200);
+  }
+  function merge(remote) {
+    if (!remote || typeof remote !== 'object') return;
+    for (const u in remote) { const a = marks[u], b = remote[u]; if (!a || (b.up || 0) > (a.up || 0)) marks[u] = b; }
+  }
+  async function pull() {
+    try {
+      const [f, s] = await Promise.all([
+        fetch(BASE + 'followers', { headers: hdr(), cache: 'no-store' }),
+        fetch(BASE + 'state', { headers: hdr(), cache: 'no-store' })
+      ]);
+      if (f.status === 401) { flash('Sync key rejected', true); return false; }
+      if (f.ok) { followers = await f.json(); localStorage.setItem('mailclub-followers', JSON.stringify(followers)); }
+      if (s.ok) merge(await s.json());
+      saveLocal(); return true;
+    } catch (_) { flash('Offline, showing local', true); return true; }
+  }
+
+  // ---- state ops ----
+  const M = u => marks[u] || (marks[u] = {});
+  function toggle(u, f) {
+    const m = M(u);
+    if (f === 'sent') { m.sent = m.sent ? 0 : Date.now(); if (!m.sent) m.yes = 0; }
+    if (f === 'yes') { m.yes = m.yes ? 0 : 1; if (m.yes && !m.sent) m.sent = Date.now(); }
+    if (f === 'skip') { m.skip = m.skip ? 0 : 1; }
+    m.up = Date.now(); save(); render();
+  }
+  function setNote(u, v) { const m = M(u); m.note = v; m.up = Date.now(); save(); }
+
+  // ---- render ----
+  function sorted() {
+    const s = $('#sort').value, a = followers.slice();
+    if (s === 'az') a.sort((x, y) => x.u.localeCompare(y.u));
+    else if (s === 'old') a.sort((x, y) => x.t.localeCompare(y.t));
+    else a.sort((x, y) => y.t.localeCompare(x.t));
+    return a;
+  }
+  function pass(f) {
+    const m = marks[f.u] || {};
+    if (view === 'todo') return !m.sent && !m.skip;
+    if (view === 'sent') return !!m.sent;
+    if (view === 'yes') return !!m.yes;
+    if (view === 'skip') return !!m.skip;
+    return true;
+  }
+  function stats() {
+    let sent = 0, yes = 0, skip = 0, td = 0, t = today();
+    for (const f of followers) { const m = marks[f.u]; if (!m) continue; if (m.sent) { sent++; if (day(m.sent) === t) td++; } if (m.yes) yes++; if (m.skip) skip++; }
+    $('#nSent').textContent = sent; $('#nYes').textContent = yes; $('#nSkip').textContent = skip;
+    $('#nLeft').textContent = followers.length - sent - skip; $('#nToday').textContent = td;
+    $('#today').className = td >= DAILY_SOFT_CAP ? 'warn' : '';
+    $('#today').title = td >= DAILY_SOFT_CAP ? 'Past the soft cap. Give Instagram a rest today.' : '';
+    $('#prog').style.width = followers.length ? ((sent + skip) / followers.length * 100).toFixed(1) + '%' : '0';
+    $('#sub').textContent = followers.length.toLocaleString() + ' followers';
+  }
+  function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function render() {
+    stats();
+    const q = $('#q').value.trim().toLowerCase();
+    const rows = sorted().filter(f => (q ? f.u.toLowerCase().includes(q) : pass(f)));
+    const list = $('#list');
+    if (!rows.length) { list.innerHTML = '<div class="empty">' + (followers.length ? 'Nothing here.' : 'No followers loaded yet.') + '</div>'; $('#cnt').textContent = ''; return; }
+    const slice = rows.slice(0, shown);
+    list.innerHTML = slice.map(f => {
+      const m = marks[f.u] || {};
+      const cls = 'row' + (m.yes ? ' yes' : m.sent ? ' sent' : '') + (m.skip ? ' skip' : '');
+      const meta = (m.sent ? 'asked ' + day(m.sent) : 'followed ' + f.t) + (m.yes ? ' · said yes' : '') + (m.skip ? ' · skipped' : '');
+      return `<div class="${cls}" data-u="${esc(f.u)}"><div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="who"><a href="https://www.instagram.com/${esc(f.u)}/" target="_blank" rel="noopener">@${esc(f.u)}</a><div class="m">${esc(meta)}</div></div>
+          <button class="b ${m.sent ? 'on-sent' : ''}" data-f="sent" title="DM sent">${m.sent ? '✓ asked' : 'asked'}</button>
+          <button class="b ${m.yes ? 'on-yes' : ''}" data-f="yes" title="They said yes">${m.yes ? '★ yes' : 'yes'}</button>
+          <button class="b ${m.skip ? 'on-skip' : ''}" data-f="skip" title="Skip this one">${m.skip ? '–' : 'skip'}</button>
+        </div>
+        ${(m.sent || m.yes || m.note) ? `<input class="note" placeholder="note (address, what they want, etc.)" value="${esc(m.note)}">` : ''}
+      </div></div>`;
+    }).join('') + (rows.length > shown ? `<button class="more" id="more">Show ${Math.min(PAGE, rows.length - shown)} more</button>` : '');
+    $('#cnt').textContent = slice.length + ' of ' + rows.length;
+  }
+
+  // ---- events ----
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button.b'); if (b) { toggle(b.closest('.row').dataset.u, b.dataset.f); return; }
+    if (e.target.id === 'more') { shown += PAGE; render(); return; }
+    const t = e.target.closest('#tabs button'); if (t) { view = t.dataset.v; shown = PAGE; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === t)); render(); }
+  });
+  document.addEventListener('change', e => { if (e.target.classList.contains('note')) setNote(e.target.closest('.row').dataset.u, e.target.value); });
+  $('#sort').onchange = () => { shown = PAGE; render(); };
+  $('#q').oninput = () => { shown = PAGE; render(); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && keyOf()) pull().then(render); });
+
+  // ---- boot ----
+  async function boot() {
+    try { followers = JSON.parse(localStorage.getItem('mailclub-followers') || '[]'); } catch (_) { followers = []; }
+    try { marks = JSON.parse(localStorage.getItem('mailclub') || '{}'); } catch (_) { marks = {}; }
+    setMode(); render();
+    if (!keyOf()) {
+      if (!followers.length) $('#list').innerHTML = '<div class="gate">This is Wade\'s mail club list.<br><br><button id="gate">Connect sync</button></div>', $('#gate').onclick = askKey;
+      return;
+    }
+    await pull(); render();
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
