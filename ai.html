@@ -32,7 +32,7 @@
   <main class="ai">
     <div class="container">
       <h1>How I build with AI</h1>
-      <p class="ai-intro">Not a resume. A show-and-tell. Everything here is real, and most of it is running while you read this.</p>
+      <p class="ai-intro">Not a resume. Everything here is real and most of it is running right now.</p>
 
       <section>
         <p class="ai-label">Running right now</p>
@@ -43,21 +43,20 @@
           <div class="ai-pipe" aria-label="Pipeline">
             <span class="p">talk into phone on a walk</span><span class="a">&rarr;</span><span class="p">transcribed</span><span class="a">&rarr;</span><span class="p">filed + cross-linked by AI</span><span class="a">&rarr;</span><span class="p">auto-committed to git</span>
           </div>
-          <p>Two layers: <strong>raw</strong> captures the AI never edits, and a <strong>wiki</strong> layer it maintains on top. A Mac Mini commits the whole thing to git every two hours. I say something on a walk; by the time I'm home it's filed, linked to five related ideas, and versioned.</p>
-          <p>It fixes the graveyard problem: ideas you capture and never revisit.</p>
+          <p>I say something on a walk. By the time I'm home it's filed, linked to five related ideas, and committed to git. Fixes the graveyard problem: ideas you capture and never revisit.</p>
         </div>
 
         <div class="ai-system">
           <h3>Burpee Counter</h3>
           <p class="ai-one-liner">Voice counting designed around the AI's failure mode.</p>
-          <p>Speech recognition mishears a man gasping at rep 70. So spoken numbers <strong>set</strong> the count instead of incrementing it, and a miss heals itself the next time I say a number. Designing around the model's weakness is most of what AI engineering actually is.</p>
+          <p>Speech recognition mishears a man gasping at rep 70. So spoken numbers <strong>set</strong> the count instead of incrementing it, and a miss heals itself. Designing around the model's weakness is most of the job.</p>
           <p class="ai-links"><a href="/projects/burpee-counter.html">The project page</a> <a href="https://wadesellers.github.io/burpee-counter/" target="_blank" rel="noopener">The live app &rarr;</a></p>
         </div>
 
         <div class="ai-system">
           <h3>AI Usage Meter</h3>
           <p class="ai-one-liner">A menubar app that tracks how much AI I have left.</p>
-          <p>When you run this many models, quota is a household utility. It sits in the menubar so I stop finding out the hard way at 11pm.</p>
+          <p>Quota is a household utility now. It sits in the menubar so I stop finding out at 11pm.</p>
           <p class="ai-links"><a href="/projects/ai-usage-meter.html">The project page</a></p>
         </div>
       </section>
@@ -65,13 +64,13 @@
       <section>
         <p class="ai-label">The bench &mdash; tools in rotation, with verdicts</p>
         <div class="ai-tools">
-          <div class="ai-tool"><span class="t-name">Claude Code</span><span class="t-take">Where everything gets built. I hand it overnight assignments &mdash; CouchWord, a whole Apple TV crossword app, came out of one.</span></div>
-          <div class="ai-tool"><span class="t-name">MCP servers</span><span class="t-take">The glue. Mail, calendar, browser, and the iOS simulator in one session. Chatbot becomes coworker.</span></div>
-          <div class="ai-tool"><span class="t-name">whisper.cpp</span><span class="t-take">Local transcription, about a second on Apple Silicon. Why voice capture costs me $0.</span></div>
-          <div class="ai-tool"><span class="t-name">Wispr Flow</span><span class="t-take">Most of the wiki starts as me talking to my pocket on a walk.</span></div>
-          <div class="ai-tool"><span class="t-name">Obsidian + Sync</span><span class="t-take">The AI maintains the files; I get to wander them.</span></div>
+          <div class="ai-tool"><span class="t-name">Claude Code</span><span class="t-take">Where everything gets built. CouchWord came out of one overnight session.</span></div>
+          <div class="ai-tool"><span class="t-name">MCP servers</span><span class="t-take">Mail, calendar, browser, iOS simulator. Chatbot becomes coworker.</span></div>
+          <div class="ai-tool"><span class="t-name">whisper.cpp</span><span class="t-take">Local transcription in about a second. Why voice costs me $0.</span></div>
+          <div class="ai-tool"><span class="t-name">Wispr Flow</span><span class="t-take">Talking to my pocket on a walk.</span></div>
+          <div class="ai-tool"><span class="t-name">Obsidian + Sync</span><span class="t-take">The AI maintains the files. I wander them.</span></div>
           <div class="ai-tool"><span class="t-name">GPT + Gemini</span><span class="t-take">Second and third opinions.</span></div>
-          <div class="ai-tool"><span class="t-name">GitHub Pages</span><span class="t-take">Hosts all of this. Free, static, boring &mdash; a compliment.</span></div>
+          <div class="ai-tool"><span class="t-name">GitHub Pages</span><span class="t-take">Free, static, boring &mdash; a compliment.</span></div>
         </div>
       </section>
 
@@ -80,27 +79,21 @@
         <ol class="ai-beliefs">
           <li>
             <strong>Design around the failure mode, not the demo.</strong>
-            <p>Self-healing beats occasionally perfect.</p>
           </li>
           <li>
             <strong>Raw stays raw.</strong>
-            <p>The model never edits originals, only a layer on top that cites them. That one rule is why I trust it with my life's notes.</p>
           </li>
           <li>
             <strong>Files are the treasure. Tools are rentals.</strong>
-            <p>Plain markdown and git. If the whole stack vanished tomorrow, the knowledge still opens in any text editor.</p>
           </li>
           <li>
             <strong>Autonomy is a dial, not a switch.</strong>
-            <p>Greenfield at midnight? Full permissions, see you in the morning. Anything I care about? Short leash.</p>
           </li>
           <li>
             <strong>$0 marginal cost is a design constraint that makes you smarter.</strong>
-            <p>Refusing a metered API forced local transcription and better architecture. The bill stayed flat; the system got smarter.</p>
           </li>
           <li>
             <strong>Specificity beats generality.</strong>
-            <p>Every AI company is building general. The opportunity is specific.</p>
           </li>
         </ol>
       </section>
@@ -111,23 +104,23 @@
           <div class="grave">
             <h3>LifeOS</h3>
             <span class="g-dates">b. January 2026 &dagger; superseded May 2026</span>
-            <p>Dump thoughts in, get insights out. The processing worked; the ritual didn't. <em>Lesson:</em> start from capture, not from reports. The rebuild became the wiki.</p>
+            <p>The processing worked; the ritual didn't. <em>Lesson:</em> start from capture, not reports.</p>
           </div>
           <div class="grave">
             <h3>The tutorial-following era</h3>
             <span class="g-dates">a kanban board and a project-management app that shall live in private repos</span>
-            <p>Built other people's apps by following their prompts. Learned the tools, shipped nothing. <em>Lesson:</em> only your own problems teach the craft.</p>
+            <p>Followed other people's prompts. Learned the tools, shipped nothing. <em>Lesson:</em> only your own problems teach the craft.</p>
           </div>
           <div class="grave">
             <h3>An AI note-taking app</h3>
             <span class="g-dates">b. and &dagger; 2026, quickly</span>
-            <p>Halfway in I realized notes apps are where notes go to die. Capture was never the hard part. <em>Lesson:</em> the graveyard tells you what the real problem was.</p>
+            <p>Notes apps are where notes go to die. <em>Lesson:</em> capture was never the hard part.</p>
           </div>
         </div>
       </section>
 
       <div class="ai-close">
-        <p>Poke it. The counter is live, the code is on GitHub, and the wiki is running on a Mac Mini in a theatre in Manhattan right now. <a href="/contact.html">Get in touch</a> if you want the long version. And yes, this page was drafted by Claude Code inside that wiki. Of course it was.</p>
+        <p>Poke it. It's all live and on GitHub. <a href="/contact.html">Get in touch</a> for the long version. And yes, this page was drafted by Claude Code inside that wiki. Of course it was.</p>
       </div>
     </div>
   </main>
