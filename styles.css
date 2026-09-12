@@ -919,6 +919,14 @@ nav a.active {
   align-items: center;
   justify-content: center;
 }
+.project-card .thumb-namesfaces img {
+  width: auto;
+  height: 82%;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
 .thumb-namesfaces .nf-deck {
   position: relative;
   width: 104px;
