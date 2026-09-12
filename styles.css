@@ -927,6 +927,14 @@ nav a.active {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
+/* The tile clip is already cropped to the card, so it fills the tile the way
+   the other ten do. */
+.project-card .thumb-namesfaces video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .thumb-namesfaces .nf-deck {
   position: relative;
   width: 104px;
