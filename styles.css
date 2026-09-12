@@ -1131,6 +1131,28 @@ nav a.active {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
 
+/* ---- Screen recording of the real app ---- */
+.project-detail .app-clip {
+  margin: 8px 0 34px;
+  text-align: center;
+}
+
+.project-detail .app-clip video {
+  width: min(300px, 72%);
+  height: auto;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  display: block;
+  margin: 0 auto;
+}
+
+.project-detail .app-clip-caption {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 14px 0 0;
+}
+
 /* ---- Screenshot row (real app shots, side by side) ---- */
 .project-detail .shot-row {
   display: flex;
