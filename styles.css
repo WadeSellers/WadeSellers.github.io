@@ -1131,6 +1131,31 @@ nav a.active {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
 
+/* ---- Screenshot row (real app shots, side by side) ---- */
+.project-detail .shot-row {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 30px 0 10px;
+}
+
+.project-detail .shot-row img {
+  width: 200px;
+  max-width: 42%;
+  height: auto;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.project-detail .shot-caption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 30px;
+}
+
 /* ---- CTA Section ---- */
 .cta {
   padding: 56px 0;
