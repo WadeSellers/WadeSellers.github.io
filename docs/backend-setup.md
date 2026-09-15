@@ -1,0 +1,88 @@
+# Backend setup (Supabase)
+
+Everything the site needs from a server is "keep a little bit of what visitors
+leave behind." Supabase gives us that with no server to run, and the whole
+setup is doable from a phone because it is mostly tapping plus one paste.
+
+## Why this is safe to ship in a public repo
+
+The `anon` key is *designed* to be public. It goes in the browser, anyone can
+read it, and that is fine. Security comes from Row Level Security policies on
+the table, not from hiding the key. The policies below allow reading and
+appending, and nothing else. Nobody can edit or delete another person's stroke,
+because no policy grants it.
+
+The honest caveat: a public insert policy means a determined person could spam
+rows. The size limits in the schema cap the damage per row, and the 24-hour
+fade means anything ugly clears itself out. If it ever becomes a real problem,
+the fix is a rate limit in an edge function, not a redesign.
+
+## Steps
+
+1. **supabase.com** in your phone browser, sign in with GitHub.
+2. **New project.** Name it `wadesellers-site`. Generate the database password
+   and save it in your password manager. Region: `East US (North Virginia)`.
+3. Wait about two minutes while it provisions.
+4. **SQL Editor** in the left nav, paste everything in the block below, **Run**.
+5. **Project Settings → API.** Supabase has moved this around between redesigns,
+   so it may be labeled "API Keys." You want two values:
+   - **Project URL** (looks like `https://abcdefgh.supabase.co`)
+   - the **anon / public** key (a long string starting `eyJ`)
+6. Send both back and they get wired into the site.
+
+Do not send the database password, the `service_role` key, or anything labeled
+secret. Those never touch the browser.
+
+## The SQL to paste
+
+```sql
+-- One finger-stroke on the wall.
+create table public.strokes (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  color      text  not null,
+  width      real  not null,
+  points     jsonb not null,
+
+  -- Caps so one request cannot dump a novel into the table.
+  constraint color_is_hex   check (color ~ '^#[0-9a-fA-F]{6}$'),
+  constraint width_sane     check (width between 1 and 48),
+  constraint points_sane    check (jsonb_array_length(points) between 2 and 600)
+);
+
+-- The wall reads "newest first," so index that.
+create index strokes_created_at_idx on public.strokes (created_at desc);
+
+alter table public.strokes enable row level security;
+
+-- Anyone may read the wall.
+create policy "wall is public"
+  on public.strokes for select
+  using (true);
+
+-- Anyone may add to the wall.
+create policy "anyone may draw"
+  on public.strokes for insert
+  with check (true);
+
+-- Deliberately no update or delete policy: strokes are append-only,
+-- and nobody can touch someone else's.
+
+-- Live updates, so a stroke appears for everyone already on the page.
+alter publication supabase_realtime add table public.strokes;
+```
+
+## Wet paint
+
+Strokes fade after 24 hours. The page only ever asks for recent ones:
+
+```sql
+select color, width, points
+from public.strokes
+where created_at > now() - interval '24 hours'
+order by created_at asc
+limit 400;
+```
+
+Old rows can be swept later with a scheduled job. They cost nothing sitting
+there, so this is not urgent.
