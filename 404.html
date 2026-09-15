@@ -1,49 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page Not Found - Wade Sellers</title>
-  <meta name="description" content="This page doesn't exist.">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
-  <link rel="stylesheet" href="/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nothing Here</title>
+<meta name="description" content="That page does not exist. Have a game instead.">
+<meta name="theme-color" content="#F4F0E6">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="/app.css">
+
+<style>
+  /* The game reads its palette off these, so it comes out in riso inks
+     instead of the old site's browns. */
+  :root {
+    --accent: #FF4D2E;
+    --text: #14110F;
+    --text-muted: #6B6154;
+    --bg-card: #FFFDF7;
+  }
+
+  .oops { padding-block: 26px 0; }
+  .oops h1 {
+    font-family: var(--disp);
+    font-weight: 800;
+    font-size: clamp(40px, 15vw, 74px);
+    line-height: .88;
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .oops h1 span { color: var(--red); display: block; }
+  .oops .lead {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--soft);
+    margin: 14px 0 20px;
+    line-height: 1.6;
+    max-width: 44ch;
+  }
+  .frame {
+    border: var(--line) solid var(--ink);
+    background: #FFFDF7;
+    box-shadow: var(--pop);
+    padding: 10px;
+  }
+  .frame canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: none;
+  }
+  .game-hint {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--soft);
+    margin: 14px 0 0;
+    line-height: 1.6;
+  }
+  .game-hint a, .oops p a { color: var(--ink); text-underline-offset: 3px; }
+  .oops a.home {
+    display: inline-block;
+    margin-top: 20px;
+    font-family: var(--disp);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 16px;
+    text-decoration: none;
+  }
+  .oops a.home:active { background: var(--red); }
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="container">
-      <a href="/" class="site-name">Wade Sellers</a>
-      <nav>
-        <a href="/">Projects</a>
-        <a href="/ai.html">AI</a>
-        <a href="/now.html">Now</a>
-        <a href="/contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+<main class="shell">
+  <section class="oops">
+    <h1>Nothing<span>Here</span></h1>
+    <p class="lead">
+      That page does not exist, which is a shame, so here is a game instead.
+      Move the paddle with your finger. Tap to launch.
+    </p>
 
-  <main class="not-found">
-    <div class="container">
-      <h1>Nothing here.</h1>
-      <p class="lead">This page doesn't exist. Play this instead.</p>
-      <div class="game-frame">
-        <canvas id="brickbreaker" width="720" height="480" aria-label="Brickbreaker game"></canvas>
-      </div>
-      <p class="game-hint">Move with your mouse. Click or tap to launch. <a href="/">Or go back to the projects &rarr;</a></p>
+    <div class="frame">
+      <canvas id="brickbreaker" width="720" height="480" aria-label="Brick breaker game"></canvas>
     </div>
-  </main>
+    <p class="game-hint">Move with your finger or mouse. Tap or click to launch.</p>
 
-  <script src="/brickbreaker.js" defer></script>
+    <a class="home" href="/">Back to the toys</a>
+  </section>
 
-  <footer>
-    <div class="container">
-      <span>&copy; 2026 Wade Sellers</span>
-      <nav>
-        <a href="mailto:wade@wadesellers.com">wade@wadesellers.com</a>
-      </nav>
-    </div>
+  <footer class="colophon">
+    Wade Sellers, New York. <a href="/archive/v1/">The old site is still here.</a>
   </footer>
+</main>
 
+<script src="/archive/v1/brickbreaker.js" defer></script>
 </body>
 </html>
