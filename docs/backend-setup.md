@@ -86,3 +86,35 @@ limit 400;
 
 Old rows can be swept later with a scheduled job. They cost nothing sitting
 there, so this is not urgent.
+
+## Optional: the visitor counter
+
+The homepage shows a "hands so far" chip when this table exists, and simply
+leaves the chip out when it does not, so there is no rush. Paste this whenever
+you want the counter to switch on:
+
+```sql
+create table public.visits (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now()
+);
+
+create index visits_created_at_idx on public.visits (created_at desc);
+
+alter table public.visits enable row level security;
+
+create policy "count is public"
+  on public.visits for select
+  using (true);
+
+create policy "anyone may arrive"
+  on public.visits for insert
+  with check (true);
+
+grant select, insert on public.visits to anon;
+```
+
+Worth saying plainly: anyone could pad this number by reloading, and there is
+no attempt to stop them. It is a counter on a toy, not an analytics product.
+If it ever matters, the fix is to record a coarse fingerprint and count
+distinct ones, but that is a different and more invasive thing.

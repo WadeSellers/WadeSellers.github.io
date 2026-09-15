@@ -1,0 +1,330 @@
+/* ------------------------------------------------------------------
+   Please Touch Everything
+   A riso-print toy catalogue: warm newsprint, four saturated inks,
+   heavy black keylines, hard offset shadows. Deliberately one theme,
+   because the whole thing is pretending to be a printed object.
+   ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  --paper:  #F4F0E6;
+  --paper2: #E9E3D4;
+  --ink:    #14110F;
+  --soft:   #6B6154;
+
+  --red:    #FF4D2E;
+  --blue:   #2B5BE8;
+  --yellow: #FFC72C;
+  --green:  #00A06B;
+  --pink:   #FF5FA2;
+
+  --disp: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --line: 3px;
+  --pop: 6px 6px 0 var(--ink);
+  --pop-sm: 4px 4px 0 var(--ink);
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+/* ------------------------------ grid view ------------------------------ */
+
+.shell {
+  min-height: 100%;
+  padding: 0 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.masthead {
+  padding: calc(22px + env(safe-area-inset-top, 0px)) 0 18px;
+}
+
+.masthead h1 {
+  font-family: var(--disp);
+  font-weight: 800;
+  font-size: clamp(38px, 13vw, 62px);
+  line-height: .88;
+  letter-spacing: -.02em;
+  margin: 0;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.masthead h1 .l2 { color: var(--red); display: block; }
+.masthead h1 .l3 { color: var(--blue); display: block; }
+
+.sub {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .04em;
+  color: var(--soft);
+  margin: 12px 0 0;
+  max-width: 44ch;
+  line-height: 1.6;
+}
+
+.ticker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.chip {
+  border: 2px solid var(--ink);
+  background: var(--paper2);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.chip b { font-weight: 600; }
+.chip.live { background: var(--yellow); }
+
+/* ------------------------------ tiles ------------------------------ */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 168px;
+  padding: 0;
+  border: var(--line) solid var(--ink);
+  background: var(--paper2);
+  box-shadow: var(--pop);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  overflow: hidden;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.tile:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.tile.wide { grid-column: 1 / -1; min-height: 216px; }
+
+.tile canvas {
+  display: block;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.tile .cap {
+  border-top: var(--line) solid var(--ink);
+  background: var(--paper);
+  padding: 9px 11px 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.tile .no {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  padding: 2px 5px;
+  border: 2px solid var(--ink);
+  flex: none;
+}
+.tile .nm {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  min-width: 0;
+}
+.tile .hint {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 3px 6px;
+}
+
+.tile.soon { opacity: 1; }
+.tile.soon .cap { background: var(--paper2); }
+.tile.soon .nm { color: var(--soft); }
+
+/* ------------------------------ footer ------------------------------ */
+
+.colophon {
+  margin-top: 26px;
+  border-top: 2px dashed var(--ink);
+  padding-top: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--soft);
+  line-height: 1.7;
+}
+.colophon a { color: var(--ink); text-underline-offset: 3px; }
+
+/* ------------------------------ toy view ------------------------------ */
+
+.toy {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+}
+
+.toybar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+  border-bottom: var(--line) solid var(--ink);
+  background: var(--paper);
+}
+.back {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 0 14px;
+  min-height: 42px;
+  cursor: pointer;
+  flex: none;
+}
+.back:active { background: var(--red); }
+.toybar .tname {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  flex: 1;
+  min-width: 0;
+}
+.toybar .tstat {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--soft);
+  text-align: right;
+  letter-spacing: .04em;
+  flex: none;
+  max-width: 40%;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: var(--line) solid var(--ink);
+  background: var(--paper);
+  overflow-x: auto;
+}
+.tools::-webkit-scrollbar { display: none; }
+
+.swatch {
+  width: 38px; height: 38px;
+  border: 3px solid var(--ink);
+  flex: none;
+  cursor: pointer;
+  padding: 0;
+}
+.swatch[aria-pressed="true"] { box-shadow: inset 0 0 0 3px var(--paper); }
+
+.tbtn {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  background: var(--paper2);
+  border: 3px solid var(--ink);
+  padding: 0 12px;
+  min-height: 42px;
+  cursor: pointer;
+  flex: none;
+  color: inherit;
+}
+.tbtn:active { background: var(--yellow); }
+.tbtn.go { background: var(--yellow); }
+
+.note {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--soft);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+/* banner shown over a toy, e.g. offline wall */
+.banner {
+  position: absolute;
+  left: 12px; right: 12px; top: 12px;
+  border: 3px solid var(--ink);
+  background: var(--yellow);
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
+  box-shadow: var(--pop-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+@media (min-width: 560px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+  .tile.wide { grid-column: 1 / -1; }
+}
