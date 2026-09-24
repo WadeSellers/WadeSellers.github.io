@@ -1,9 +1,9 @@
 /* ------------------------------------------------------------------
    Toy 04 — The Band
 
-   Wraps the Pit Band engine (vendor/pit-band.js), which is the same
-   generative lo-fi engine behind the House Band Mac app. Nothing is
-   recorded; every bar is rolled fresh.
+   Wraps the House Band engine (vendor/pit-band.js, copied from
+   WadeSellers/house-band; see vendor/README.md for why the file still
+   carries the old name). Nothing is recorded; every bar is rolled fresh.
 
    Two things shape this toy:
 
