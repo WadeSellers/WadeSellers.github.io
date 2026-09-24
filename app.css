@@ -534,3 +534,12 @@ img { max-width: 100%; }
   100% { transform: scale(1); }
 }
 .matbtn.pulse .sw { animation: chippulse .34s ease-out; }
+
+/* A plain row of controls inside a stacked tool bar. */
+.toolrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+.toolrow::-webkit-scrollbar { display: none; }

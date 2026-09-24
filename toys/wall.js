@@ -8,6 +8,12 @@
    The trick that makes it feel alive: it does not load finished. It
    redraws the strokes already there, in the order they were made,
    before it hands you the pen.
+
+   Time-lapse is the same trick over the whole history rather than the
+   last day, with the date of each mark showing as it is drawn. It is a
+   button and not the default because the wall's first job is to hand
+   you a pen, and sitting through the archive every visit would wear
+   out fast. Ask for it and you get the lot.
    ------------------------------------------------------------------ */
 (function () {
   "use strict";
@@ -42,6 +48,8 @@
       raf: 0,
       poll: 0,
       newestSeen: null,
+      lapse: null,
+      lapseBtn: null,
       view: null
     };
 
@@ -105,13 +113,28 @@
     ctx.stroke();
   }
 
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  function stamp(iso) {
+    var d = new Date(iso);
+    if (!iso || isNaN(d.getTime())) return "";
+    var h = d.getHours(), ap = h < 12 ? "am" : "pm";
+    var hh = h % 12; if (hh === 0) hh = 12;
+    var mm = d.getMinutes(); if (mm < 10) mm = "0" + mm;
+    return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() +
+           " · " + hh + ":" + mm + ap;
+  }
+
   function frame() {
     var v = state.view = view();
     var ctx = state.ctx;
+    var L = state.lapse;
+    var list = L ? L.strokes : state.strokes;
+    var done = L ? L.qi : state.qi;
 
     ctx.clearRect(0, 0, v.w, v.h);
 
-    // the wall itself
     ctx.save();
     ctx.translate(v.ox, v.oy);
     ctx.scale(v.s, v.s);
@@ -119,24 +142,26 @@
     ctx.fillStyle = "#FFFDF7";
     ctx.fillRect(0, 0, W, H);
 
-    // everything fully revealed
-    var done = state.qi;
-    var drawn = 0;
-    for (var i = 0; i < state.strokes.length; i++) {
-      var st = state.strokes[i];
+    var drawn = 0, cur = 0;
+    for (var i = 0; i < list.length; i++) {
+      var st = list[i];
       if (drawn + st.points.length <= done) {
         paintStroke(ctx, st);
         drawn += st.points.length;
+        cur = i + 1;
       } else if (drawn < done) {
         paintStroke(ctx, st, done - drawn);
+        cur = i + 1;
         drawn = done;
         break;
       } else break;
     }
 
-    // my own, always fully drawn
-    for (var j = 0; j < state.mine.length; j++) paintStroke(ctx, state.mine[j]);
-    if (state.drawing) paintStroke(ctx, state.drawing);
+    // Live marks belong to the live wall, not to a replay of the archive.
+    if (!L) {
+      for (var j = 0; j < state.mine.length; j++) paintStroke(ctx, state.mine[j]);
+      if (state.drawing) paintStroke(ctx, state.drawing);
+    }
 
     ctx.restore();
 
@@ -144,11 +169,36 @@
     ctx.strokeStyle = "#14110F";
     ctx.lineWidth = 3;
     ctx.strokeRect(v.ox + 1.5, v.oy + 1.5, W * v.s - 3, H * v.s - 3);
+
+    if (L) {
+      // the date of the mark being drawn right now, burned in like a
+      // camera's timestamp rather than tucked away in the chrome
+      var idx = Math.max(0, Math.min(list.length - 1, cur - 1));
+      var barH = Math.min(34, v.h * 0.07);
+      var by = v.oy + H * v.s - barH - 3;
+      ctx.fillStyle = "#14110F";
+      ctx.fillRect(v.ox + 3, by, W * v.s - 6, barH);
+      ctx.fillStyle = "#F4F0E6";
+      ctx.font = "500 12px 'IBM Plex Mono', ui-monospace, monospace";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "left";
+      ctx.fillText(list.length ? stamp(list[idx].at) : "nothing here yet",
+                   v.ox + 12, by + barH / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#F0A830";
+      ctx.fillText(cur + " / " + list.length, v.ox + W * v.s - 12, by + barH / 2);
+    }
   }
 
   function loop() {
     if (!state) return;
-    if (state.qi < totalPoints()) {
+    var L = state.lapse;
+    if (L) {
+      if (L.qi < L.total) {
+        L.qi = Math.min(L.total, L.qi + L.perFrame);
+        if (L.qi >= L.total) state.api.status("time-lapse done · " + L.strokes.length + " marks");
+      }
+    } else if (state.qi < totalPoints()) {
       state.qi = Math.min(totalPoints(), state.qi + state.perFrame);
       if (state.qi >= totalPoints()) settled();
     }
@@ -156,16 +206,18 @@
     state.raf = requestAnimationFrame(loop);
   }
 
-  function totalPoints() {
+  function countPoints(list) {
     var n = 0;
-    for (var i = 0; i < state.strokes.length; i++) n += state.strokes[i].points.length;
+    for (var i = 0; i < list.length; i++) n += list[i].points.length;
     return n;
   }
+
+  function totalPoints() { return countPoints(state.strokes); }
 
   function redraw() { if (state) frame(); }
 
   function settled() {
-    if (!state) return;
+    if (!state || state.lapse) return;
     state.api.status(
       (state.online ? "" : "offline · ") + state.strokes.length + " marks"
     );
@@ -174,7 +226,7 @@
   /* --------------------------- input --------------------------- */
 
   function down(e) {
-    if (!state) return;
+    if (!state || state.lapse) return;   // no drawing over a replay
     e.preventDefault();
     if (state.canvas.setPointerCapture && e.pointerId != null) {
       try { state.canvas.setPointerCapture(e.pointerId); } catch (err) {}
@@ -308,28 +360,81 @@
       if (!isFinite(x) || !isFinite(y)) continue;
       pts.push([Math.max(-50, Math.min(W + 50, x)), Math.max(-50, Math.min(H + 50, y))]);
     }
-    return pts.length ? { color: r.color, width: w, points: pts } : null;
+    return pts.length ? { color: r.color, width: w, points: pts, at: r.created_at } : null;
+  }
+
+  /* --------------------------- time-lapse --------------------------- */
+
+  function startLapse() {
+    var api = state.api;
+    if (!api.db.ready) {
+      api.banner("No wall connected, so there is no history to play back.");
+      return;
+    }
+    state.lapseBtn.disabled = true;
+    api.status("loading the whole history");
+
+    // No time filter here: the live wall only shows the last day, but every
+    // mark ever made is still in the table, and this is the one place that
+    // shows them all.
+    var q = "select=created_at,color,width,points&order=created_at.asc&limit=3000";
+    api.db.select("strokes", q).then(function (rows) {
+      if (!state) return;
+      state.lapseBtn.disabled = false;
+      var list = rows.map(clean).filter(Boolean);
+      if (!list.length) {
+        api.banner("Nothing on the wall yet. Draw something and it becomes the first frame.");
+        api.status("no history yet");
+        return;
+      }
+      var total = countPoints(list);
+      state.lapse = {
+        strokes: list,
+        total: total,
+        qi: 0,
+        // Scaled to the archive's size so it always runs about twenty
+        // seconds, whether there are ten marks or three thousand.
+        perFrame: Math.max(1, Math.ceil(total / (60 * 20)))
+      };
+      state.lapseBtn.textContent = "Stop";
+      state.lapseBtn.className = "tbtn";
+      api.status("replaying " + list.length + " marks");
+    }).catch(function (err) {
+      if (!state) return;
+      state.lapseBtn.disabled = false;
+      api.banner("Could not load the history. " + String(err.message || err).slice(0, 90));
+    });
+  }
+
+  function stopLapse() {
+    if (!state) return;
+    state.lapse = null;
+    state.qi = totalPoints();      // back to the live wall, fully drawn
+    state.lapseBtn.textContent = "Time-lapse";
+    state.lapseBtn.className = "tbtn go";
+    settled();
   }
 
   /* --------------------------- tools --------------------------- */
 
   function buildTools(api) {
-    INKS.forEach(function (hex) {
-      var b = document.createElement("button");
-      b.className = "swatch";
-      b.type = "button";
-      b.style.background = hex;
-      b.setAttribute("aria-label", "ink " + hex);
-      b.setAttribute("aria-pressed", hex === state.ink ? "true" : "false");
-      b.addEventListener("click", function () {
-        state.ink = hex;
-        api.lsSet("wall.ink", hex);
-        Array.prototype.forEach.call(api.tools.querySelectorAll(".swatch"), function (s) {
-          s.setAttribute("aria-pressed", s === b ? "true" : "false");
-        });
-      });
-      api.tools.appendChild(b);
+    // Two rows: the inks sit on the bottom one because they are what a
+    // thumb reaches for most, and the buttons above them. One row of all
+    // of it would have run off the side of a phone.
+    api.tools.className = "tools stacked";
+
+    var top = document.createElement("div");
+    top.className = "toolrow";
+
+    var lapseBtn = document.createElement("button");
+    lapseBtn.className = "tbtn go";
+    lapseBtn.type = "button";
+    lapseBtn.textContent = "Time-lapse";
+    lapseBtn.addEventListener("click", function () {
+      if (state.lapse) stopLapse(); else startLapse();
     });
+    state.lapseBtn = lapseBtn;
+    top.appendChild(lapseBtn);
 
     var sz = document.createElement("button");
     sz.className = "tbtn";
@@ -340,7 +445,34 @@
       sz.textContent = SIZE_NAMES[state.size];
       api.lsSet("wall.size", String(state.size));
     });
-    api.tools.appendChild(sz);
+    top.appendChild(sz);
+
+    var note = document.createElement("span");
+    note.className = "note";
+    note.textContent = "every mark ever made, oldest first";
+    top.appendChild(note);
+
+    var inks = document.createElement("div");
+    inks.className = "matrow";
+    INKS.forEach(function (hex) {
+      var b = document.createElement("button");
+      b.className = "swatch";
+      b.type = "button";
+      b.style.background = hex;
+      b.setAttribute("aria-label", "ink " + hex);
+      b.setAttribute("aria-pressed", hex === state.ink ? "true" : "false");
+      b.addEventListener("click", function () {
+        state.ink = hex;
+        api.lsSet("wall.ink", hex);
+        Array.prototype.forEach.call(inks.querySelectorAll(".swatch"), function (o) {
+          o.setAttribute("aria-pressed", o === b ? "true" : "false");
+        });
+      });
+      inks.appendChild(b);
+    });
+
+    api.tools.appendChild(top);
+    api.tools.appendChild(inks);
   }
 
   /* --------------------------- tile preview --------------------------- */
