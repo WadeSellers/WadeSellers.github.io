@@ -57,10 +57,17 @@
       return fetch(CFG.supabaseUrl + "/rest/v1/" + table + "?" + (query || "select=id"), {
         headers: db.headers({ "Prefer": "count=exact", "Range": "0-0" })
       }).then(function (r) {
-        var cr = r.headers.get("content-range") || "";
-        var total = cr.split("/")[1];
         if (!r.ok && r.status !== 206) throw new Error("HTTP " + r.status);
-        return total === "*" || total == null ? 0 : parseInt(total, 10) || 0;
+        // The count rides in Content-Range, which is not a CORS-safelisted
+        // header: if the server ever stops exposing it we get null here.
+        // Throwing means the chip removes itself. Returning 0 would put a
+        // confident, wrong number on the page instead.
+        var cr = r.headers.get("content-range");
+        var total = cr ? cr.split("/")[1] : null;
+        if (total == null || total === "*") throw new Error("no count header");
+        var n = parseInt(total, 10);
+        if (isNaN(n)) throw new Error("bad count header: " + total);
+        return n;
       });
     },
 
@@ -78,6 +85,29 @@
           throw new Error("HTTP " + r.status + " " + t.slice(0, 160));
         });
         return true;
+      });
+    },
+
+    // Insert and get the row back. The visits table's id is an identity
+    // column, so the id of the row this visit just wrote IS the visitor
+    // number, which saves doing an insert and then a count.
+    insertReturning: function (table, row) {
+      if (!db.ready) return Promise.reject(new Error("no config"));
+      return fetch(CFG.supabaseUrl + "/rest/v1/" + table, {
+        method: "POST",
+        headers: db.headers({
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        }),
+        body: JSON.stringify(row)
+      }).then(function (r) {
+        if (!r.ok) return r.text().then(function (t) {
+          throw new Error("HTTP " + r.status + " " + t.slice(0, 160));
+        });
+        return r.json();
+      }).then(function (rows) {
+        if (!rows || !rows.length) throw new Error("no row returned");
+        return rows[0];
       });
     }
   };
@@ -242,17 +272,21 @@
 
   /* ----------------------------- ticker ----------------------------- */
   function ticker() {
-    var n = parseInt(lsGet("pte.visits", "0"), 10) + 1;
-    lsSet("pte.visits", String(n));
     var you = document.getElementById("chip-you");
-    if (you) you.innerHTML = "your visit <b>#" + n + "</b>";
-
     var wallChip = document.getElementById("chip-wall");
-    var visitChip = document.getElementById("chip-visits");
+
+    // Counted locally too, so the chip has something true to say before the
+    // database answers, and something to fall back on if it never does.
+    var mine = parseInt(lsGet("pte.visits", "0"), 10) + 1;
+    lsSet("pte.visits", String(mine));
+
+    function localOnly() {
+      if (you) you.innerHTML = "your visit <b>#" + mine + "</b>";
+    }
 
     if (!db.ready) {
       if (wallChip) wallChip.remove();
-      if (visitChip) visitChip.remove();
+      localOnly();
       return;
     }
 
@@ -263,13 +297,19 @@
       if (wallChip) wallChip.remove();
     });
 
-    // The visits table is optional. If it is not there yet, the chip
-    // simply does not appear rather than showing a broken number.
-    db.count("visits", "select=id").then(function (c) {
-      if (visitChip) visitChip.innerHTML = "<b>" + c.toLocaleString() + "</b> hands so far";
-      db.insert("visits", {}).catch(function () {});
+    // Every view counts as a visitor, repeat or not. That is not the same as
+    // unique people and is not claimed to be: the chip says "visitor #N",
+    // which is exactly what it is.
+    db.insertReturning("visits", {}).then(function (row) {
+      if (you && row && row.id != null) {
+        you.innerHTML = "visitor <b>#" + Number(row.id).toLocaleString() + "</b>";
+      } else {
+        localOnly();
+      }
     }).catch(function () {
-      if (visitChip) visitChip.remove();
+      // The visits table may not exist yet; fall back rather than showing
+      // a broken number.
+      localOnly();
     });
   }
 
