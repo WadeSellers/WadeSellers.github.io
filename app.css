@@ -328,3 +328,55 @@ img { max-width: 100%; }
   .grid { grid-template-columns: repeat(3, 1fr); }
   .tile.wide { grid-column: 1 / -1; }
 }
+
+/* ------------------------------ now playing ------------------------------ */
+/* Sits over the grid while the band plays, so leaving the toy never means
+   losing the music or the way to switch it off. */
+
+.nowplaying {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px 7px 7px;
+  border: var(--line) solid var(--ink);
+  background: var(--yellow);
+  box-shadow: var(--pop-sm);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.nowplaying .pstop {
+  width: 30px; height: 30px;
+  flex: none;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+}
+/* a stop square, drawn rather than shipped as an icon */
+.nowplaying .pstop::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  background: var(--ink);
+}
+.nowplaying .pstop:active { background: var(--red); }
+.nowplaying .pname {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nowplaying .pchord {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  opacity: .7;
+  min-width: 5.5ch;
+}
