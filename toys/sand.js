@@ -12,6 +12,11 @@
    Nobody scripted the water cycle either; it is just what those rules
    do when you leave them alone.
 
+   Taps and drains turn it from a thing you pour into a thing you build:
+   a tap keeps producing as long as there is room under it, a drain eats
+   whatever touches it, and between the two you can run a loop that
+   never needs topping up.
+
    Everyone gets the same 120x160 world, letterboxed to fit, so a pile
    built on one phone looks like the pile on another.
 
@@ -25,6 +30,7 @@
 
   var COLS = 120, ROWS = 160;
   var EMPTY = 0, SAND = 1, WATER = 2, STONE = 3, PLANT = 4, FIRE = 5, STEAM = 6;
+  var TAP_SAND = 7, TAP_WATER = 8, DRAIN = 9;
 
   var INK = {};
   INK[EMPTY] = [244, 240, 230];
@@ -34,6 +40,11 @@
   INK[PLANT] = [  0, 160, 107];
   INK[FIRE]  = [255,  77,  46];
   INK[STEAM] = [201, 214, 222];
+  // devices read as darker versions of what they make, so a tap looks
+  // related to its output without needing a second drawing pass
+  INK[TAP_SAND]  = [176, 130,  20];
+  INK[TAP_WATER] = [ 24,  56, 150];
+  INK[DRAIN]     = [ 20,  17,  15];
   // a second, hotter tone so flames shimmer instead of sitting there flat
   var FIRE_HOT = [255, 199, 44];
 
@@ -43,8 +54,18 @@
     { id: STONE, name: "Stone", css: "#6B6154", does: "holds still" },
     { id: PLANT, name: "Moss",  css: "#00A06B", does: "climbs when wet" },
     { id: FIRE,  name: "Fire",  css: "#FF4D2E", does: "burns moss" },
+    // One chip, two devices. Tapping it again while it is already selected
+    // switches what it pours, which costs no extra room in the row and
+    // explains itself because the label changes as you do it.
+    { name: "Tap", cycle: [
+        { id: TAP_SAND,  name: "Sand tap",  css: "#B08214", does: "pours sand forever" },
+        { id: TAP_WATER, name: "Water tap", css: "#183896", does: "pours water forever" }
+      ] },
+    { id: DRAIN, name: "Drain", css: "#14110F", does: "swallows it" },
     { id: EMPTY, name: "Erase", css: "#F4F0E6", does: "rubs it out" }
   ];
+
+  function isDevice(m) { return m === TAP_SAND || m === TAP_WATER || m === DRAIN; }
 
   var state = null;
 
@@ -70,6 +91,7 @@
       last: null,
       flip: false,
       frame: 0,
+      cap: null,
       raf: 0,
       view: null
     };
@@ -156,7 +178,10 @@
   }
 
   function blob(cx, cy) {
-    var b = state.brush, c = state.cells, m = state.mat;
+    var c = state.cells, m = state.mat;
+    // A fat brush of taps would flood the box in a second, so devices go
+    // down small and deliberate while materials stay generous.
+    var b = isDevice(m) ? 1 : state.brush;
     for (var y = cy - b; y <= cy + b; y++) {
       if (y < 0 || y >= ROWS) continue;
       for (var x = cx - b; x <= cx + b; x++) {
@@ -198,6 +223,14 @@
           // find a level: creep sideways into empty space
           var d = Math.random() < 0.5 ? -1 : 1;
           if (x + d >= 0 && x + d < COLS && c[idx(x + d, y)] === EMPTY) swap(x, y, x + d, y);
+        } else if (here === TAP_SAND || here === TAP_WATER) {
+          // Only into empty space, so a backed-up tap simply stops rather
+          // than pushing a column of sand through the floor.
+          if (c[idx(x, y + 1)] === EMPTY && Math.random() < 0.13) {
+            c[idx(x, y + 1)] = (here === TAP_SAND) ? SAND : WATER;
+          }
+        } else if (here === DRAIN) {
+          suck(x, y);
         } else if (here === PLANT) {
           // Loose moss falls until it lands on something, so a sprinkle
           // settles onto the sand instead of hanging in mid-air. It sinks
@@ -285,6 +318,21 @@
     if (Math.random() < 0.004) c[a] = WATER;   // a slow drizzle even in open air
   }
 
+  // A drain eats anything loose it touches, on all four sides, so water
+  // running sideways into one disappears the way it would down a plughole.
+  function suck(x, y) {
+    var c = state.cells;
+    for (var k = 0; k < 4; k++) {
+      var nx = x + (k === 0 ? -1 : k === 1 ? 1 : 0);
+      var ny = y + (k === 2 ? -1 : k === 3 ? 1 : 0);
+      if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) continue;
+      var t = c[idx(nx, ny)];
+      if (t === SAND || t === WATER || t === PLANT || t === STEAM || t === FIRE) {
+        c[idx(nx, ny)] = EMPTY;
+      }
+    }
+  }
+
   function slide(x, y, what) {
     var c = state.cells;
     var d = Math.random() < 0.5 ? -1 : 1;
@@ -361,48 +409,92 @@
 
   /* --------------------------- tools --------------------------- */
 
+  // Feedback belongs where the thumb is. The old status line lived in the
+  // opposite corner of the screen from the chips, so picking a material
+  // updated something you were not looking at. This sits directly above
+  // them and flashes, and the chip itself pulses, so the answer to "what
+  // did I just pick" arrives where the question was asked.
+  function say(api, name, does) {
+    if (!state || !state.cap) return;
+    state.cap.querySelector(".cap-t").textContent = name;
+    state.cap.querySelector(".cap-d").textContent = does;
+    restart(state.cap, "flash");
+    api.status(name);
+  }
+
+  // Removing the class and reading a layout property forces the browser to
+  // settle before it goes back on, which is what makes the animation replay
+  // when the same chip is tapped twice.
+  function restart(el, cls) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
   function buildTools(api) {
+    api.tools.className = "tools stacked";
+
+    var cap = document.createElement("div");
+    cap.className = "matcap";
+    cap.innerHTML = '<span class="cap-t"></span><span class="cap-d"></span>';
+
+    var clear = document.createElement("button");
+    clear.className = "tbtn tiny";
+    clear.type = "button";
+    clear.textContent = "Empty";
+    clear.addEventListener("click", function () { state.cells.fill(EMPTY); });
+    cap.appendChild(clear);
+
+    var row = document.createElement("div");
+    row.className = "matrow";
+
+    api.tools.appendChild(cap);
+    api.tools.appendChild(row);
+    state.cap = cap;
+
     MATS.forEach(function (mat) {
-      // The colour alone is a guessing game, so each one is named under its
-      // chip and says what it does the moment you pick it.
+      var cyc = 0;
+      function current() { return mat.cycle ? mat.cycle[cyc] : mat; }
+
       var b = document.createElement("button");
       b.className = "matbtn";
       b.type = "button";
-      b.setAttribute("aria-label", mat.name + ", " + mat.does);
-      b.setAttribute("aria-pressed", mat.id === state.mat ? "true" : "false");
 
       var chip = document.createElement("span");
       chip.className = "sw";
-      chip.style.background = mat.css;
-      if (mat.id === EMPTY) chip.style.borderStyle = "dashed";
-
       var lb = document.createElement("span");
       lb.className = "lb";
-      lb.textContent = mat.name;
-
       b.appendChild(chip);
       b.appendChild(lb);
 
+      function render() {
+        var m = current();
+        chip.style.background = m.css;
+        chip.style.borderStyle = (m.id === EMPTY) ? "dashed" : "solid";
+        // The chip keeps the short name; the caption carries the long one,
+        // which is the only place there is room for "Water tap".
+        lb.textContent = mat.cycle ? mat.name : m.name;
+        b.setAttribute("aria-label", m.name + ", " + m.does);
+      }
+      render();
+      b.setAttribute("aria-pressed", current().id === state.mat ? "true" : "false");
+
       b.addEventListener("click", function () {
-        state.mat = mat.id;
-        api.status(mat.name + " · " + mat.does);
-        Array.prototype.forEach.call(api.tools.querySelectorAll(".matbtn"), function (s) {
-          s.setAttribute("aria-pressed", s === b ? "true" : "false");
+        var already = (state.mat === current().id);
+        if (already && mat.cycle) { cyc = (cyc + 1) % mat.cycle.length; render(); }
+        var m = current();
+        state.mat = m.id;
+        say(api, m.name, m.does);
+        Array.prototype.forEach.call(row.querySelectorAll(".matbtn"), function (o) {
+          o.setAttribute("aria-pressed", o === b ? "true" : "false");
         });
+        restart(b, "pulse");
       });
-      api.tools.appendChild(b);
+
+      row.appendChild(b);
     });
 
-    var clear = document.createElement("button");
-    clear.className = "tbtn";
-    clear.type = "button";
-    clear.textContent = "Empty";
-    clear.addEventListener("click", function () {
-      state.cells.fill(EMPTY);
-    });
-    api.tools.appendChild(clear);
-
-    api.status("Sand · piles up");
+    say(api, "Sand", "piles up");
   }
 
   /* --------------------------- tile preview --------------------------- */

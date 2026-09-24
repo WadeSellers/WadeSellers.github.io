@@ -468,8 +468,69 @@ img { max-width: 100%; }
 
 /* Six named chips plus a button fit exactly at 390px and overflow a 320px
    phone, pushing the last control off-screen. Tighten the chips there. */
-@media (max-width: 360px) {
-  .tools { gap: 6px; padding-left: 10px; padding-right: 10px; }
+@media (max-width: 400px) {
+  .tools { padding-left: 10px; padding-right: 10px; }
+  .matrow { gap: 5px; }
   .matbtn .sw { width: 30px; height: 28px; border-width: 2px; }
-  .matbtn .lb { font-size: 8.5px; letter-spacing: .02em; }
+  .matbtn .lb { font-size: 8px; letter-spacing: 0; }
 }
+
+/* ------------------------------ stacked tool bar ------------------------------ */
+/* For toys whose controls need a caption: a line of feedback directly above
+   the row it describes, rather than in the far corner of the screen. */
+
+.tools.stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: visible;
+}
+.matcap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 2px;
+}
+.matcap .cap-t {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+.matcap .cap-d {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--soft);
+  flex: 1;
+  min-width: 0;
+}
+.matcap .tbtn.tiny {
+  min-height: 32px;
+  font-size: 10.5px;
+  padding: 0 10px;
+  border-width: 2px;
+  align-self: center;
+}
+.matrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+.matrow::-webkit-scrollbar { display: none; }
+
+@keyframes capflash {
+  from { background: var(--yellow); }
+  to   { background: transparent; }
+}
+.matcap.flash { animation: capflash .55s ease-out; }
+
+@keyframes chippulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.matbtn.pulse .sw { animation: chippulse .34s ease-out; }
