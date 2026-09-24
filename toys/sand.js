@@ -1,9 +1,16 @@
 /* ------------------------------------------------------------------
    Toy 05 — Sandbox
 
-   Pour sand, pour water, draw stone, plant a seed. Nothing here is
-   scripted: the pile shapes, the way water finds a level, and where
-   the moss climbs all fall out of four rules applied per cell.
+   Pour sand, pour water, draw stone, plant a seed, set it on fire.
+   Nothing here is scripted: the pile shapes, the way water finds a
+   level, where the moss climbs and how the weather turns all fall out
+   of one rule per material.
+
+   Those rules close into a loop. Fire burns moss and boils water into
+   steam. Steam rises, collects under whatever is above it, and
+   condenses back into rain. Rain feeds the moss. Moss feeds the fire.
+   Nobody scripted the water cycle either; it is just what those rules
+   do when you leave them alone.
 
    Everyone gets the same 120x160 world, letterboxed to fit, so a pile
    built on one phone looks like the pile on another.
@@ -17,7 +24,7 @@
   "use strict";
 
   var COLS = 120, ROWS = 160;
-  var EMPTY = 0, SAND = 1, WATER = 2, STONE = 3, PLANT = 4;
+  var EMPTY = 0, SAND = 1, WATER = 2, STONE = 3, PLANT = 4, FIRE = 5, STEAM = 6;
 
   var INK = {};
   INK[EMPTY] = [244, 240, 230];
@@ -25,12 +32,17 @@
   INK[WATER] = [ 43,  91, 232];
   INK[STONE] = [107,  97,  84];
   INK[PLANT] = [  0, 160, 107];
+  INK[FIRE]  = [255,  77,  46];
+  INK[STEAM] = [201, 214, 222];
+  // a second, hotter tone so flames shimmer instead of sitting there flat
+  var FIRE_HOT = [255, 199, 44];
 
   var MATS = [
     { id: SAND,  name: "Sand",  css: "#FFC72C" },
     { id: WATER, name: "Water", css: "#2B5BE8" },
     { id: STONE, name: "Stone", css: "#6B6154" },
     { id: PLANT, name: "Moss",  css: "#00A06B" },
+    { id: FIRE,  name: "Fire",  css: "#FF4D2E" },
     { id: EMPTY, name: "Erase", css: "#F4F0E6" }
   ];
 
@@ -57,6 +69,7 @@
       down: false,
       last: null,
       flip: false,
+      frame: 0,
       raf: 0,
       view: null
     };
@@ -160,15 +173,20 @@
   /* --------------------------- the rules --------------------------- */
 
   function step() {
-    var c = state.cells;
     state.flip = !state.flip;
+    fall();
+    rise();
+  }
 
-    // bottom row up, so a falling grain cannot be moved twice in one pass
+  // Everything that falls, scanned bottom row up, so a grain that drops
+  // cannot be moved a second time in the same pass.
+  function fall() {
+    var c = state.cells;
     for (var y = ROWS - 2; y >= 0; y--) {
       for (var i = 0; i < COLS; i++) {
         var x = state.flip ? i : COLS - 1 - i;   // alternate scan, or piles lean
         var here = c[idx(x, y)];
-        if (here === EMPTY || here === STONE) continue;
+        if (here === EMPTY || here === STONE || here === FIRE || here === STEAM) continue;
 
         if (here === SAND) {
           var below = c[idx(x, y + 1)];
@@ -190,6 +208,81 @@
         }
       }
     }
+  }
+
+  // Everything that rises, scanned top row down for the same reason in
+  // reverse: a cell moving up lands in a row already dealt with, so one
+  // puff of steam climbs one cell per frame rather than the whole way.
+  function rise() {
+    var c = state.cells;
+    // from y = 0, not y = 1: steam that reaches the top row still has to be
+    // processed, or it sticks to the ceiling forever instead of raining back
+    for (var y = 0; y < ROWS; y++) {
+      for (var i = 0; i < COLS; i++) {
+        var x = state.flip ? i : COLS - 1 - i;
+        var here = c[idx(x, y)];
+        if (here === FIRE) burn(x, y);
+        else if (here === STEAM) steam(x, y);
+      }
+    }
+  }
+
+  function burn(x, y) {
+    var c = state.cells, a = idx(x, y);
+
+    // Water still wins, but not on the first touch. A flame boils what it
+    // is against and takes its chances, so fire tipped into a pool throws
+    // up a cloud before it drowns instead of vanishing with a hiss.
+    var touchedWater = false;
+    for (var k = 0; k < 4; k++) {
+      var nx = x + (k === 0 ? -1 : k === 1 ? 1 : 0);
+      var ny = y + (k === 2 ? -1 : k === 3 ? 1 : 0);
+      if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) continue;
+      if (c[idx(nx, ny)] === WATER) {
+        c[idx(nx, ny)] = STEAM;
+        touchedWater = true;
+      }
+    }
+    if (touchedWater) {
+      if (Math.random() < 0.35) { c[a] = EMPTY; return; }
+    }
+
+    // Moss catches, which is what makes a fire travel.
+    for (var dy = -1; dy <= 1; dy++) {
+      for (var dx = -1; dx <= 1; dx++) {
+        var px = x + dx, py = y + dy;
+        if (px < 0 || px >= COLS || py < 0 || py >= ROWS) continue;
+        // Low on purpose. Higher and a spark flashes a whole bed in under a
+        // second; at this rate you watch the front creep, which is the point.
+        if (c[idx(px, py)] === PLANT && Math.random() < 0.055) c[idx(px, py)] = FIRE;
+      }
+    }
+
+    if (Math.random() < 0.045) { c[a] = EMPTY; return; }  // burns out
+    if (y > 0 && c[idx(x, y - 1)] === EMPTY && Math.random() < 0.4) swap(x, y, x, y - 1);
+  }
+
+  function steam(x, y) {
+    var c = state.cells, a = idx(x, y);
+    var up = y - 1;
+
+    if (up >= 0 && c[idx(x, up)] === EMPTY) {
+      if (Math.random() < 0.85) { swap(x, y, x, up); return; }
+    } else {
+      // Nowhere up to go means it is collecting against a ceiling, which
+      // is exactly when real vapour gives up and turns back into water.
+      if (Math.random() < 0.05) { c[a] = WATER; return; }
+    }
+
+    var d = Math.random() < 0.5 ? -1 : 1;
+    for (var k = 0; k < 2; k++, d = -d) {
+      var nx = x + d;
+      if (nx < 0 || nx >= COLS) continue;
+      if (up >= 0 && c[idx(nx, up)] === EMPTY) { swap(x, y, nx, up); return; }
+      if (c[idx(nx, y)] === EMPTY) { swap(x, y, nx, y); return; }
+    }
+
+    if (Math.random() < 0.004) c[a] = WATER;   // a slow drizzle even in open air
   }
 
   function slide(x, y, what) {
@@ -244,8 +337,11 @@
     step();
 
     var c = state.cells, d = state.img.data;
+    state.frame++;
     for (var i = 0, p = 0; i < c.length; i++, p += 4) {
       var ink = INK[c[i]];
+      // cheap shimmer: alternate two tones per cell, offset by position
+      if (c[i] === FIRE && ((i * 7 + state.frame) % 3) === 0) ink = FIRE_HOT;
       d[p] = ink[0]; d[p + 1] = ink[1]; d[p + 2] = ink[2]; d[p + 3] = 255;
     }
     state.octx.putImageData(state.img, 0, 0);
