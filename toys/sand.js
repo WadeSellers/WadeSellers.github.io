@@ -38,12 +38,12 @@
   var FIRE_HOT = [255, 199, 44];
 
   var MATS = [
-    { id: SAND,  name: "Sand",  css: "#FFC72C" },
-    { id: WATER, name: "Water", css: "#2B5BE8" },
-    { id: STONE, name: "Stone", css: "#6B6154" },
-    { id: PLANT, name: "Moss",  css: "#00A06B" },
-    { id: FIRE,  name: "Fire",  css: "#FF4D2E" },
-    { id: EMPTY, name: "Erase", css: "#F4F0E6" }
+    { id: SAND,  name: "Sand",  css: "#FFC72C", does: "piles up" },
+    { id: WATER, name: "Water", css: "#2B5BE8", does: "finds a level" },
+    { id: STONE, name: "Stone", css: "#6B6154", does: "holds still" },
+    { id: PLANT, name: "Moss",  css: "#00A06B", does: "climbs when wet" },
+    { id: FIRE,  name: "Fire",  css: "#FF4D2E", does: "burns moss" },
+    { id: EMPTY, name: "Erase", css: "#F4F0E6", does: "rubs it out" }
   ];
 
   var state = null;
@@ -363,18 +363,30 @@
 
   function buildTools(api) {
     MATS.forEach(function (mat) {
+      // The colour alone is a guessing game, so each one is named under its
+      // chip and says what it does the moment you pick it.
       var b = document.createElement("button");
-      b.className = "swatch";
+      b.className = "matbtn";
       b.type = "button";
-      b.style.background = mat.css;
-      b.title = mat.name;
-      b.setAttribute("aria-label", mat.name);
+      b.setAttribute("aria-label", mat.name + ", " + mat.does);
       b.setAttribute("aria-pressed", mat.id === state.mat ? "true" : "false");
-      if (mat.id === EMPTY) b.style.borderStyle = "dashed";
+
+      var chip = document.createElement("span");
+      chip.className = "sw";
+      chip.style.background = mat.css;
+      if (mat.id === EMPTY) chip.style.borderStyle = "dashed";
+
+      var lb = document.createElement("span");
+      lb.className = "lb";
+      lb.textContent = mat.name;
+
+      b.appendChild(chip);
+      b.appendChild(lb);
+
       b.addEventListener("click", function () {
         state.mat = mat.id;
-        api.status(mat.name);
-        Array.prototype.forEach.call(api.tools.querySelectorAll(".swatch"), function (s) {
+        api.status(mat.name + " · " + mat.does);
+        Array.prototype.forEach.call(api.tools.querySelectorAll(".matbtn"), function (s) {
           s.setAttribute("aria-pressed", s === b ? "true" : "false");
         });
       });
@@ -384,13 +396,13 @@
     var clear = document.createElement("button");
     clear.className = "tbtn";
     clear.type = "button";
-    clear.textContent = "Empty it";
+    clear.textContent = "Empty";
     clear.addEventListener("click", function () {
       state.cells.fill(EMPTY);
     });
     api.tools.appendChild(clear);
 
-    api.status("Sand");
+    api.status("Sand · piles up");
   }
 
   /* --------------------------- tile preview --------------------------- */

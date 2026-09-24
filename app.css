@@ -431,3 +431,45 @@ img { max-width: 100%; }
   padding: 0;
 }
 .follow .fx:active { background: var(--red); color: var(--paper); }
+
+/* ------------------------------ named material picker ------------------------------ */
+/* A colour swatch on its own is a guessing game. Its own class rather than a
+   modifier on .swatch, so the two never fight over width and border. */
+
+.matbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.matbtn .sw {
+  display: block;
+  width: 38px;
+  height: 30px;
+  border: 3px solid var(--ink);
+}
+.matbtn .lb {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--soft);
+  line-height: 1;
+}
+.matbtn[aria-pressed="true"] .sw { box-shadow: inset 0 0 0 3px var(--paper); }
+.matbtn[aria-pressed="true"] .lb { color: var(--ink); font-weight: 600; }
+.matbtn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+/* Six named chips plus a button fit exactly at 390px and overflow a 320px
+   phone, pushing the last control off-screen. Tighten the chips there. */
+@media (max-width: 360px) {
+  .tools { gap: 6px; padding-left: 10px; padding-right: 10px; }
+  .matbtn .sw { width: 30px; height: 28px; border-width: 2px; }
+  .matbtn .lb { font-size: 8.5px; letter-spacing: .02em; }
+}
