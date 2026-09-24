@@ -126,10 +126,12 @@
         b.addEventListener("click", function () { go(t.id); });
       } else {
         b.addEventListener("click", function () {
-          var n = b.querySelector(".nm");
-          var was = n.textContent;
-          n.textContent = "not yet. follow and find out";
-          setTimeout(function () { n.textContent = was; }, 1600);
+          // Tapping a locked tile is somebody asking what comes next, so
+          // this is the one place the ask is the honest answer.
+          var host = document.getElementById("aside");
+          var el = window.ARCADE.follow &&
+                   window.ARCADE.follow.show(host, "Not built yet. This is where new ones show up.");
+          if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
         });
       }
 

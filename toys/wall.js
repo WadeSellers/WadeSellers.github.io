@@ -226,6 +226,13 @@
       if (!state) return;
       state.online = true;
       settled();
+      // Their mark is now on the wall for the next person. Once, ever.
+      if (window.ARCADE.follow) {
+        window.ARCADE.follow.showOnce(
+          api.stage,
+          "That's on the wall for the next person now. I put new toys here.",
+          true);
+      }
     }).catch(function (err) {
       if (!state) return;
       state.online = false;
