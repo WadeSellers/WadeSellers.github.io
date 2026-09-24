@@ -543,3 +543,18 @@ img { max-width: 100%; }
   overflow-x: auto;
 }
 .toolrow::-webkit-scrollbar { display: none; }
+
+/* An armed destructive control: it says what it is about to do. */
+.tbtn.warn {
+  background: var(--red);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* A note inside a control row scrolls with the row rather than wrapping
+   into a tall column and stealing height from the toy above it. On a
+   narrow phone there is no room for it at all. */
+.toolrow .note { white-space: nowrap; }
+@media (max-width: 400px) {
+  .toolrow .note { display: none; }
+}

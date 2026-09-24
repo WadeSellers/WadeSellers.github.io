@@ -118,3 +118,45 @@ Worth saying plainly: anyone could pad this number by reloading, and there is
 no attempt to stop them. It is a counter on a toy, not an analytics product.
 If it ever matters, the fix is to record a coarse fingerprint and count
 distinct ones, but that is a different and more invasive thing.
+
+## The rest of the tables
+
+Two more small tables. Paste the whole block at once; neither depends on the
+other, and the site works without both, it just quietly leaves out the parts
+they power.
+
+```sql
+-- Powers "visitor #N" on the homepage. The id is the visitor number: the
+-- page inserts a row and reads back the id it was given.
+create table public.visits (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now()
+);
+create index visits_created_at_idx on public.visits (created_at desc);
+alter table public.visits enable row level security;
+create policy "count is public" on public.visits for select using (true);
+create policy "anyone may arrive" on public.visits for insert with check (true);
+grant select, insert on public.visits to anon;
+
+-- Powers the Wipe button on the wall. A wipe records a moment, it does not
+-- delete anything: the live wall shows marks made since the last wipe, and
+-- the time-lapse replays every mark ever made, clearing at each wipe so the
+-- history reads as chapters instead of one pile.
+create table public.wipes (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now()
+);
+create index wipes_created_at_idx on public.wipes (created_at desc);
+alter table public.wipes enable row level security;
+create policy "wipes are public" on public.wipes for select using (true);
+create policy "anyone may wipe" on public.wipes for insert with check (true);
+grant select, insert on public.wipes to anon;
+```
+
+The Wipe button stays hidden until the `wipes` table exists, so nothing looks
+broken in the meantime.
+
+Anyone can wipe, and no attempt is made to stop them. On a toy that is the
+right trade: the marks are never destroyed, so the worst a bad actor achieves
+is starting a new chapter, and the time-lapse still shows everything they tried
+to hide.

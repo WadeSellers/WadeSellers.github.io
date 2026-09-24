@@ -14,6 +14,13 @@
    button and not the default because the wall's first job is to hand
    you a pen, and sitting through the archive every visit would wear
    out fast. Ask for it and you get the lot.
+
+   Wiping is what stops that becoming one endless pile. Anyone can wipe
+   the wall, and the wipe is recorded rather than destructive: the marks
+   stay in the table forever, and the replay honours the wipe by
+   clearing the wall right there and starting the next stretch. So the
+   history reads as chapters, filled and cleared and filled again,
+   instead of everything ever drawn on top of everything else.
    ------------------------------------------------------------------ */
 (function () {
   "use strict";
@@ -26,6 +33,13 @@
   var SIZES = [4, 10, 22];
   var SIZE_NAMES = ["Thin", "Medium", "Fat"];
   var MAX_POINTS = 600;   // matches the check constraint on the table
+  // A wipe has no points of its own, so it is given a cost in the replay
+  // timeline. Measured in frames rather than points on purpose: a fixed
+  // point cost is a third of a second on a busy wall and a long wait on a
+  // quiet one. At roughly a second and a quarter you actually see the wall
+  // empty before the next chapter starts filling it, which is the entire
+  // reason for showing the wipe at all.
+  var WIPE_FRAMES = 75;
 
   var state = null;
 
@@ -48,8 +62,11 @@
       raf: 0,
       poll: 0,
       newestSeen: null,
+      lastWipe: null,
+      wipesOk: false,
       lapse: null,
       lapseBtn: null,
+      wipeBtn: null,
       view: null
     };
 
@@ -126,11 +143,18 @@
            " · " + hh + ":" + mm + ap;
   }
 
+  // Same date without the time, for when the full one will not fit.
+  function shortStamp(iso) {
+    var d = new Date(iso);
+    if (!iso || isNaN(d.getTime())) return "";
+    return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear();
+  }
+
   function frame() {
     var v = state.view = view();
     var ctx = state.ctx;
     var L = state.lapse;
-    var list = L ? L.strokes : state.strokes;
+    var list = L ? L.items : state.strokes;
     var done = L ? L.qi : state.qi;
 
     ctx.clearRect(0, 0, v.w, v.h);
@@ -142,16 +166,28 @@
     ctx.fillStyle = "#FFFDF7";
     ctx.fillRect(0, 0, W, H);
 
-    var drawn = 0, cur = 0;
+    var drawn = 0, cur = 0, shown = 0, curAt = null, wiping = false;
     for (var i = 0; i < list.length; i++) {
-      var st = list[i];
-      if (drawn + st.points.length <= done) {
-        paintStroke(ctx, st);
-        drawn += st.points.length;
+      var it = list[i];
+      // A wipe carries no points, so it is costed separately; everything
+      // else in this loop treats the two the same way.
+      var cost = it.wipe ? L.wipeCost : it.points.length;
+      if (drawn + cost <= done) {
+        if (it.wipe) { ctx.fillStyle = "#FFFDF7"; ctx.fillRect(0, 0, W, H); }
+        else { paintStroke(ctx, it); shown++; }
+        drawn += cost;
         cur = i + 1;
+        curAt = it.at;
       } else if (drawn < done) {
-        paintStroke(ctx, st, done - drawn);
+        if (it.wipe) {
+          ctx.fillStyle = "#FFFDF7"; ctx.fillRect(0, 0, W, H);
+          wiping = true;
+        } else {
+          paintStroke(ctx, it, done - drawn);
+          shown++;
+        }
         cur = i + 1;
+        curAt = it.at;
         drawn = done;
         break;
       } else break;
@@ -173,7 +209,6 @@
     if (L) {
       // the date of the mark being drawn right now, burned in like a
       // camera's timestamp rather than tucked away in the chrome
-      var idx = Math.max(0, Math.min(list.length - 1, cur - 1));
       var barH = Math.min(34, v.h * 0.07);
       var by = v.oy + H * v.s - barH - 3;
       ctx.fillStyle = "#14110F";
@@ -181,12 +216,24 @@
       ctx.fillStyle = "#F4F0E6";
       ctx.font = "500 12px 'IBM Plex Mono', ui-monospace, monospace";
       ctx.textBaseline = "middle";
-      ctx.textAlign = "left";
-      ctx.fillText(list.length ? stamp(list[idx].at) : "nothing here yet",
-                   v.ox + 12, by + barH / 2);
+      // Draw the counter first and measure it, so the left-hand text can be
+      // shortened to whatever room is actually left. "wiped clean" plus a
+      // full timestamp is longer than a date alone and was running straight
+      // into the counter on a narrow phone.
+      var right = shown + " / " + L.markCount;
       ctx.textAlign = "right";
       ctx.fillStyle = "#F0A830";
-      ctx.fillText(cur + " / " + list.length, v.ox + W * v.s - 12, by + barH / 2);
+      ctx.fillText(right, v.ox + W * v.s - 12, by + barH / 2);
+
+      var room = (W * v.s) - 24 - ctx.measureText(right).width - 14;
+      var lead = wiping ? "wiped clean · " : "";
+      var left = curAt ? lead + stamp(curAt) : "nothing here yet";
+      if (ctx.measureText(left).width > room) left = lead + shortStamp(curAt);
+      if (ctx.measureText(left).width > room) left = wiping ? "wiped clean" : shortStamp(curAt);
+
+      ctx.textAlign = "left";
+      ctx.fillStyle = wiping ? "#F0A830" : "#F4F0E6";
+      ctx.fillText(left, v.ox + 12, by + barH / 2);
     }
   }
 
@@ -196,7 +243,7 @@
     if (L) {
       if (L.qi < L.total) {
         L.qi = Math.min(L.total, L.qi + L.perFrame);
-        if (L.qi >= L.total) state.api.status("time-lapse done · " + L.strokes.length + " marks");
+        if (L.qi >= L.total) state.api.status("time-lapse done · " + L.markCount + " marks");
       }
     } else if (state.qi < totalPoints()) {
       state.qi = Math.min(totalPoints(), state.qi + state.perFrame);
@@ -302,20 +349,27 @@
       settled();
       return;
     }
-    var since = new Date(Date.now() - (api.cfg.wallHours || 24) * 3600e3).toISOString();
-    var q = "select=created_at,color,width,points" +
-            "&created_at=gt." + since +
-            "&order=created_at.asc" +
-            "&limit=" + (api.cfg.wallLimit || 300);
+    var floorTime = new Date(Date.now() - (api.cfg.wallHours || 24) * 3600e3).toISOString();
 
-    api.db.select("strokes", q).then(function (rows) {
+    latestWipe().then(function (wipeAt) {
       if (!state) return;
+      state.lastWipe = wipeAt;
+      // Whichever is later: a day ago, or the last time somebody wiped.
+      var since = (wipeAt && wipeAt > floorTime) ? wipeAt : floorTime;
+      var q = "select=created_at,color,width,points" +
+              "&created_at=gt." + since +
+              "&order=created_at.asc" +
+              "&limit=" + (api.cfg.wallLimit || 300);
+      return api.db.select("strokes", q);
+    }).then(function (rows) {
+      if (!state || !rows) return;
       state.online = true;
       state.strokes = rows.map(clean).filter(Boolean);
       if (state.strokes.length) state.newestSeen = rows[rows.length - 1].created_at;
       // Replay the whole wall in about four seconds, whatever its size.
       state.perFrame = Math.max(1, Math.ceil(totalPoints() / (60 * 4)));
       state.qi = 0;
+      if (state.wipeBtn) state.wipeBtn.hidden = !state.wipesOk;
       api.status("replaying " + state.strokes.length + " marks");
       state.poll = setInterval(fresh, 10000);
     }).catch(function (err) {
@@ -327,10 +381,64 @@
     });
   }
 
+  // The most recent wipe, or null. A missing table is not an error here:
+  // it just means wiping has never been set up, and the wall carries on
+  // exactly as it did before, minus the button.
+  function latestWipe() {
+    return state.api.db.select("wipes", "select=created_at&order=created_at.desc&limit=1")
+      .then(function (rows) {
+        if (state) state.wipesOk = true;
+        return rows && rows.length ? rows[0].created_at : null;
+      })
+      .catch(function () {
+        if (state) state.wipesOk = false;
+        return null;
+      });
+  }
+
+  function wipeNow() {
+    var api = state.api;
+    api.db.insert("wipes", {}).then(function () {
+      if (!state) return;
+      clearLocally();
+      api.status("wiped · 0 marks");
+      // Read back the wipe we just made, so the poller does not immediately
+      // see it as somebody else's and clear the wall a second time.
+      latestWipe().then(function (at) { if (state) state.lastWipe = at; });
+    }).catch(function (err) {
+      if (!state) return;
+      api.banner("Could not wipe the wall. " + String(err.message || err).slice(0, 90));
+    });
+  }
+
+  function clearLocally() {
+    state.strokes = [];
+    state.mine = [];
+    state.drawing = null;
+    state.qi = 0;
+  }
+
   // Pull anything added since we loaded, so two people drawing at once
   // see each other within about ten seconds.
   function fresh() {
-    if (!state || !state.newestSeen) return;
+    if (!state) return;
+
+    // Somebody else may have wiped since we last looked. Check that first:
+    // pulling their new strokes onto a wall that should be empty would put
+    // two people on different walls.
+    if (state.wipesOk) {
+      latestWipe().then(function (at) {
+        if (!state || !at) return;
+        if (state.lastWipe && at <= state.lastWipe) return;
+        if (!state.lastWipe && !state.strokes.length) { state.lastWipe = at; return; }
+        state.lastWipe = at;
+        state.newestSeen = at;
+        clearLocally();
+        settled();
+      }).catch(function () {});
+    }
+
+    if (!state.newestSeen) return;
     var q = "select=created_at,color,width,points" +
             "&created_at=gt." + state.newestSeen +
             "&order=created_at.asc&limit=100";
@@ -377,28 +485,49 @@
     // No time filter here: the live wall only shows the last day, but every
     // mark ever made is still in the table, and this is the one place that
     // shows them all.
-    var q = "select=created_at,color,width,points&order=created_at.asc&limit=3000";
-    api.db.select("strokes", q).then(function (rows) {
+    var pStrokes = api.db.select("strokes",
+      "select=created_at,color,width,points&order=created_at.asc&limit=3000");
+    // A missing wipes table just means no chapter breaks, not a failure.
+    var pWipes = api.db.select("wipes", "select=created_at&order=created_at.asc&limit=500")
+      .catch(function () { return []; });
+
+    Promise.all([pStrokes, pWipes]).then(function (res) {
       if (!state) return;
       state.lapseBtn.disabled = false;
-      var list = rows.map(clean).filter(Boolean);
-      if (!list.length) {
+      var marks = res[0].map(clean).filter(Boolean);
+      if (!marks.length) {
         api.banner("Nothing on the wall yet. Draw something and it becomes the first frame.");
         api.status("no history yet");
         return;
       }
-      var total = countPoints(list);
+      var wipes = (res[1] || []).map(function (r) {
+        return { wipe: true, at: r.created_at };
+      });
+      // One chronological timeline. Times are compared as numbers rather
+      // than as strings, so a stray timezone format cannot scramble it.
+      var items = marks.concat(wipes).sort(function (a, b) {
+        return Date.parse(a.at) - Date.parse(b.at);
+      });
+      // Pace off the drawing alone, so the speed of the marks does not
+      // change with how often people wiped. The pauses are then added on
+      // top: a history with more chapters simply takes a little longer.
+      var drawPoints = 0;
+      for (var i = 0; i < marks.length; i++) drawPoints += marks[i].points.length;
+      var perFrame = Math.max(1, Math.ceil(drawPoints / (60 * 20)));
+      var wipeCost = perFrame * WIPE_FRAMES;
+
       state.lapse = {
-        strokes: list,
-        total: total,
+        items: items,
+        markCount: marks.length,
+        total: drawPoints + wipes.length * wipeCost,
+        wipeCost: wipeCost,
         qi: 0,
-        // Scaled to the archive's size so it always runs about twenty
-        // seconds, whether there are ten marks or three thousand.
-        perFrame: Math.max(1, Math.ceil(total / (60 * 20)))
+        perFrame: perFrame
       };
       state.lapseBtn.textContent = "Stop";
       state.lapseBtn.className = "tbtn";
-      api.status("replaying " + list.length + " marks");
+      api.status("replaying " + marks.length + " marks"
+                 + (wipes.length ? " · " + wipes.length + " wipes" : ""));
     }).catch(function (err) {
       if (!state) return;
       state.lapseBtn.disabled = false;
@@ -447,9 +576,41 @@
     });
     top.appendChild(sz);
 
+    // Wiping clears the wall for everyone, so it asks once first. Nothing
+    // is actually lost: the marks stay in the table and the replay still
+    // shows them, with the wipe as the break between chapters.
+    var wipeBtn = document.createElement("button");
+    wipeBtn.className = "tbtn";
+    wipeBtn.type = "button";
+    wipeBtn.textContent = "Wipe";
+    wipeBtn.hidden = true;          // shown once we know the table is there
+    var armed = 0;
+    wipeBtn.addEventListener("click", function () {
+      if (state.lapse) return;
+      var now = Date.now();
+      if (armed && now - armed < 4000) {
+        armed = 0;
+        wipeBtn.textContent = "Wipe";
+        wipeBtn.className = "tbtn";
+        wipeNow();
+        return;
+      }
+      armed = now;
+      wipeBtn.textContent = "Wipe it?";
+      wipeBtn.className = "tbtn warn";
+      setTimeout(function () {
+        if (!armed || Date.now() - armed < 3900) return;
+        armed = 0;
+        wipeBtn.textContent = "Wipe";
+        wipeBtn.className = "tbtn";
+      }, 4100);
+    });
+    state.wipeBtn = wipeBtn;
+    top.appendChild(wipeBtn);
+
     var note = document.createElement("span");
     note.className = "note";
-    note.textContent = "every mark ever made, oldest first";
+    note.textContent = "a wipe starts a new chapter";
     top.appendChild(note);
 
     var inks = document.createElement("div");
