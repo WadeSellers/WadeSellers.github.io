@@ -92,12 +92,13 @@
       flip: false,
       frame: 0,
       cap: null,
+      world: -1,
       raf: 0,
       view: null
     };
 
     buildTools(api);
-    seed();
+    newWorld(api, true);
 
     cv.addEventListener("pointerdown", function (e) {
       e.preventDefault();
@@ -121,33 +122,107 @@
     state = null;
   }
 
-  // Open mid-cascade rather than empty: sand is already falling past two
-  // ledges, so the first frame shows what the toy does before a finger
-  // touches it.
-  function seed() {
-    var c = state.cells, x, y;
+  /* --------------------------- worlds --------------------------- */
+  // Small painting helpers, so each world reads as a description of itself
+  // rather than a page of nested loops.
 
-    for (y = ROWS - 4; y < ROWS; y++) {
-      for (x = 0; x < COLS; x++) c[idx(x, y)] = STONE;
+  function box(x0, y0, x1, y1, m) {
+    var c = state.cells;
+    for (var y = Math.max(0, y0); y < Math.min(ROWS, y1); y++) {
+      for (var x = Math.max(0, x0); x < Math.min(COLS, x1); x++) c[idx(x, y)] = m;
     }
-    function ledge(x0, x1, yy) {
-      for (var i = x0; i < x1; i++) {
-        for (var j = yy; j < yy + 3; j++) c[idx(i, j)] = STONE;
+  }
+  function scatter(n, x0, y0, w, h, m) {
+    var c = state.cells;
+    for (var i = 0; i < n; i++) {
+      var x = x0 + ((Math.random() * w) | 0);
+      var y = y0 + ((Math.random() * h) | 0);
+      if (x >= 0 && x < COLS && y >= 0 && y < ROWS) c[idx(x, y)] = m;
+    }
+  }
+  function disc(cx, cy, r, m) {
+    var c = state.cells;
+    for (var y = cy - r; y <= cy + r; y++) {
+      if (y < 0 || y >= ROWS) continue;
+      for (var x = cx - r; x <= cx + r; x++) {
+        if (x < 0 || x >= COLS) continue;
+        var dx = x - cx, dy = y - cy;
+        if (dx * dx + dy * dy <= r * r) c[idx(x, y)] = m;
       }
     }
-    ledge(8, 68, 74);
-    ledge(52, 112, 108);
+  }
+  function floor() { box(0, ROWS - 4, COLS, ROWS, STONE); }
 
-    for (var i = 0; i < 2600; i++) {
-      x = 18 + ((Math.random() * 44) | 0);
-      y = 14 + ((Math.random() * 46) | 0);
-      c[idx(x, y)] = SAND;
-    }
-    for (i = 0; i < 700; i++) {
-      x = 70 + ((Math.random() * 38) | 0);
-      y = 20 + ((Math.random() * 30) | 0);
-      c[idx(x, y)] = WATER;
-    }
+  // Every world opens mid-something. A still first frame would not show
+  // what the box does, and the whole point is that it is already running.
+  var WORLDS = [
+    { name: "Terraces", make: function () {
+        floor();
+        box(8, 74, 68, 77, STONE);
+        box(52, 108, 112, 111, STONE);
+        scatter(2600, 18, 14, 44, 46, SAND);
+        scatter(700, 70, 20, 38, 30, WATER);
+      } },
+
+    { name: "Hourglass", make: function () {
+        floor();
+        for (var i = 0; i < 44; i++) {
+          box(0, 60 + i, 44 - i, 61 + i, STONE);
+          box(76 + i, 60 + i, COLS, 61 + i, STONE);
+        }
+        scatter(3200, 12, 6, 96, 48, SAND);
+      } },
+
+    { name: "Caves", make: function () {
+        box(0, 40, COLS, ROWS, STONE);
+        for (var i = 0; i < 26; i++) {
+          disc(10 + ((Math.random() * 100) | 0), 55 + ((Math.random() * 90) | 0),
+               6 + ((Math.random() * 11) | 0), EMPTY);
+        }
+        floor();
+        scatter(900, 20, 46, 80, 14, WATER);
+        scatter(260, 10, 120, 100, 30, PLANT);
+      } },
+
+    { name: "Downpour", make: function () {
+        floor();
+        for (var x = 8; x < COLS - 8; x += 14) box(x, 6, x + 2, 8, TAP_WATER);
+        box(0, ROWS - 12, COLS, ROWS - 4, SAND);
+        scatter(420, 4, ROWS - 16, COLS - 8, 4, PLANT);
+        box(58, ROWS - 4, 62, ROWS, DRAIN);
+      } },
+
+    { name: "Islands", make: function () {
+        floor();
+        var ys = [46, 78, 110];
+        for (var k = 0; k < ys.length; k++) {
+          var x0 = 12 + ((Math.random() * 40) | 0);
+          box(x0, ys[k], x0 + 40, ys[k] + 3, STONE);
+        }
+        box(30, 10, 32, 12, TAP_SAND);
+        box(84, 10, 86, 12, TAP_WATER);
+        box(0, ROWS - 4, 6, ROWS, DRAIN);
+        box(COLS - 6, ROWS - 4, COLS, ROWS, DRAIN);
+      } },
+
+    { name: "Ember field", make: function () {
+        floor();
+        box(0, ROWS - 26, COLS, ROWS - 4, SAND);
+        scatter(2400, 2, ROWS - 42, COLS - 4, 18, PLANT);
+        scatter(500, 10, ROWS - 30, 30, 8, WATER);
+        scatter(6, 90, ROWS - 40, 20, 6, FIRE);
+      } }
+  ];
+
+  // Never the same one twice running, or "new world" lands on what is
+  // already on screen and reads as a broken button.
+  function newWorld(api, first) {
+    var i = (Math.random() * WORLDS.length) | 0;
+    if (!first && i === state.world) i = (i + 1 + ((Math.random() * (WORLDS.length - 1)) | 0)) % WORLDS.length;
+    state.world = i;
+    state.cells.fill(EMPTY);
+    WORLDS[i].make();
+    if (!first) say(api, WORLDS[i].name, "a fresh start");
   }
 
   /* --------------------------- geometry --------------------------- */
@@ -437,6 +512,13 @@
     var cap = document.createElement("div");
     cap.className = "matcap";
     cap.innerHTML = '<span class="cap-t"></span><span class="cap-d"></span>';
+
+    var roll = document.createElement("button");
+    roll.className = "tbtn tiny go";
+    roll.type = "button";
+    roll.textContent = "New world";
+    roll.addEventListener("click", function () { newWorld(api, false); });
+    cap.appendChild(roll);
 
     var clear = document.createElement("button");
     clear.className = "tbtn tiny";
